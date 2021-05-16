@@ -26,6 +26,5 @@
     "types": ["node"]
   },
 
-  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"],
-  "exclude": ["src/sw/**/*"]
+  "include": ["src/**/*.ts"]
 }
