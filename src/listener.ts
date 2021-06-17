@@ -36,5 +36,5 @@ export const initListener = () => {
   Logger.info(`Listening for UPDATE:s to '${tableName}'...`)
 
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  supabase.from<Patch>(tableName).on("UPDATE", handler)
+  supabase.from<Patch>(tableName).on("UPDATE", handler).subscribe()
 }
