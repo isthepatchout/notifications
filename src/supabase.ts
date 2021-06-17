@@ -41,6 +41,7 @@ export const getUnnotifiedSubscriptions = async (patch: Patch) => {
   const { data, error, count } = await supabase
     .from<PushSubscription>("subscriptions")
     .select("*", { count: "exact" })
+    .eq("environment", process.env.NODE_ENV as string)
     .neq("lastNotified", patch.id)
     .limit(500)
 
