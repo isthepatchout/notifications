@@ -32,16 +32,9 @@ const sendNotificationsInBatches = async (patch: Patch): Promise<number> => {
   return count - subscriptions.length
 }
 
-export const initListener = async () => {
+export const initListener = () => {
   Logger.info(`Listening for UPDATE:s to '${tableName}'...`)
 
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   supabase.from<Patch>(tableName).on("UPDATE", handler)
-
-  handler({
-    // @ts-ignore
-    old: { releasedAt: null },
-    // @ts-ignore
-    new: { id: "7.30" },
-  })
 }
