@@ -10,17 +10,11 @@ export const supabase = new SupabaseClient(
   process.env.SUPABASE_SERVICE_KEY as string,
 )
 
-export const handleSentNotifications = async (
-  subscriptions: PushSubscription[],
-  patch: Patch,
-) => {
+export const handleSentNotifications = async (endpoints: string[], patch: Patch) => {
   await supabase
     .from<PushSubscription>("subscriptions")
     .update({ lastNotified: patch.id })
-    .in(
-      "endpoint",
-      subscriptions.map((subscription) => subscription.endpoint),
-    )
+    .in("endpoint", endpoints)
 }
 
 export const handleSendErrors = async (errors: WebPushError[]) => {
@@ -48,7 +42,7 @@ export const getUnnotifiedSubscriptions = async (patch: Patch) => {
     .from<PushSubscription>("subscriptions")
     .select("*", { count: "exact" })
     .neq("lastNotified", patch.id)
-    .limit(50)
+    .limit(500)
 
   if (error) {
     throw new Error(error.message)

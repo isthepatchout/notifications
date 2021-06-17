@@ -1061,6 +1061,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"bottleneck@npm:2.19.5":
+  version: 2.19.5
+  resolution: "bottleneck@npm:2.19.5"
+  checksum: c5eef1bbea12cef1f1405e7306e7d24860568b0f7ac5eeab706a86762b3fc65ef6d1c641c8a166e4db90f412fc5c948fc5ce8008a8cd3d28c7212ef9c3482bda
+  languageName: node
+  linkType: hard
+
 "brace-expansion@npm:^1.1.7":
   version: 1.1.11
   resolution: "brace-expansion@npm:1.1.11"
@@ -2913,6 +2920,7 @@ fsevents@~2.3.2:
     "@tsconfig/node16": 1.0.1
     "@types/pino": 6.3.8
     "@types/web-push": 3.3.0
+    bottleneck: 2.19.5
     dotenv: 10.0.0
     eslint: 7.28.0
     lint-staged: 11.0.0
