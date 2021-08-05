@@ -16,54 +16,47 @@ on:
       - "!.github/workflows/CICD.yml"
 
 jobs:
+  dependencies:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 16
+          cache: yarn
+
+      - run: yarn install --immutable
+
+      - uses: actions/upload-artifact@master
+        with:
+          name: dependencies
+          path: ./node_modules
+
   lint:
     runs-on: ubuntu-latest
 
+    needs:
+      - dependencies
+
     steps:
-      - uses: actions/checkout@v2
-
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir
-        run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
-
-      - uses: actions/cache@v2
+      - name: download webapp artifacts
+        uses: actions/download-artifact@master
         with:
-          path: ${{ steps.yarn-cache-dir.outputs.dir }}
-          key: yarn-c1-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            yarn-c1-
-
-      - uses: actions/setup-node@v2
-        with:
-          node-version: 14
-
-      - name: Install dependencies
-        run: yarn install --immutable
+          name: dependencies
+          path: ./node_modules
 
       - run: yarn lint
 
   typecheck:
     runs-on: ubuntu-latest
 
+    needs:
+      - dependencies
+
     steps:
-      - uses: actions/checkout@v2
-
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir
-        run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
-
-      - uses: actions/cache@v2
+      - name: download webapp artifacts
+        uses: actions/download-artifact@master
         with:
-          path: ${{ steps.yarn-cache-dir.outputs.dir }}
-          key: yarn-c1-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            yarn-c1-
-
-      - uses: actions/setup-node@v2
-        with:
-          node-version: 14
-
-      - name: Install dependencies
-        run: yarn install --immutable
+          name: dependencies
+          path: ./
 
       - run: yarn typecheck
