@@ -3,7 +3,7 @@ import { WebPushError } from "web-push"
 import { SupabaseClient } from "@supabase/supabase-js"
 
 import { Logger } from "./logger"
-import { Patch, PushSubscription } from "./types"
+import { Patch, PatchSubscription } from "./types"
 
 export const supabase = new SupabaseClient(
   process.env.SUPABASE_URL as string,
@@ -12,7 +12,7 @@ export const supabase = new SupabaseClient(
 
 export const handleSentNotifications = async (endpoints: string[], patch: Patch) => {
   await supabase
-    .from<PushSubscription>("subscriptions")
+    .from<PatchSubscription>("subscriptions")
     .update({ lastNotified: patch.id })
     .in("endpoint", endpoints)
 }
@@ -25,7 +25,7 @@ export const handleSendErrors = async (errors: WebPushError[]) => {
   Logger.info(`${expired.length} subscriptions have expired.`)
 
   await supabase
-    .from<PushSubscription>("subscriptions")
+    .from<PatchSubscription>("subscriptions")
     .delete()
     .in(
       "endpoint",
@@ -39,7 +39,7 @@ export const handleSendErrors = async (errors: WebPushError[]) => {
 
 export const getUnnotifiedSubscriptions = async (patch: Patch) => {
   const { data, error, count } = await supabase
-    .from<PushSubscription>("subscriptions")
+    .from<PatchSubscription>("subscriptions")
     .select("*", { count: "exact" })
     .eq("environment", process.env.NODE_ENV as string)
     .neq("lastNotified", patch.id)

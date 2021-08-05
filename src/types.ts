@@ -11,7 +11,7 @@ export type Patch = {
   number: number
 }
 
-export type PushSubscription = {
+export type PatchSubscription = {
   endpoint: string
   createdAt: string
   auth: string
