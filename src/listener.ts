@@ -1,7 +1,7 @@
 import { SupabaseRealtimePayload } from "@supabase/supabase-js"
 
 import { Logger } from "./logger"
-import { sendNotification } from "./notifications"
+import { sendWebPushNotification } from "./notifications"
 import { getUnnotifiedSubscriptions, supabase } from "./supabase"
 import { Patch } from "./types"
 
@@ -27,7 +27,7 @@ const sendNotificationsInBatches = async (patch: Patch): Promise<number> => {
 
   Logger.debug(`Found ${subscriptions.length} notifications to send.`)
 
-  await sendNotification(subscriptions, patch)
+  await sendWebPushNotification(subscriptions, patch)
 
   return count - subscriptions.length
 }

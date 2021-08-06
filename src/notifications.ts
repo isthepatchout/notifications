@@ -4,7 +4,7 @@ import { WebPushError } from "web-push"
 
 import { captureException } from "@sentry/node"
 
-import { Patch, PushEventPatch, PushSubscription } from "../src/types"
+import { Patch, PushEventPatch, PatchSubscription } from "../src/types"
 
 import { Logger } from "./logger"
 import { handleSendErrors, handleSentNotifications } from "./supabase"
@@ -22,8 +22,8 @@ const pushLimiter = new Bottleneck({
 
 const isTruthy = <T>(input: T | false | null | undefined): input is T => !!input
 
-export const sendNotification = async (
-  subscriptions: PushSubscription[],
+export const sendWebPushNotification = async (
+  subscriptions: PatchSubscription[],
   patch: Patch,
 ) => {
   const promises: Array<Promise<string | WebPushError | Error>> = []
