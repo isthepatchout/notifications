@@ -30,15 +30,15 @@
     "@sentry/node": "6.15.0",
     "@supabase/supabase-js": "1.28.5",
     "bottleneck": "2.19.5",
-    "pino": "6.13.1",
-    "pino-pretty": "6.0.0",
+    "pino": "7.5.1",
+    "pino-logflare": "0.3.12",
+    "pino-pretty": "7.2.0",
     "web-push": "3.4.5"
   },
   "devDependencies": {
     "@beequeue/eslint-plugin": "0.2.1",
     "@tsconfig/node16": "1.0.2",
     "@types/node": "16.11.11",
-    "@types/pino": "6.3.12",
     "@types/web-push": "3.3.2",
     "dotenv": "10.0.0",
     "eslint": "7.32.0",
