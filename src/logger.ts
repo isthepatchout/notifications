@@ -11,6 +11,7 @@ export const Logger = Pino(
       source: "notifications",
     },
   },
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   !isDev
     ? createWriteStream({
         apiKey: process.env.LOGFLARE_API_KEY!,
