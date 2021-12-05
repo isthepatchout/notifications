@@ -1,19 +1,8 @@
 name: CI/CD
 on:
   push:
-    branches:
-      - main
-    paths-ignore:
-      - "**.md"
-      - ".gitignore"
-      - ".github/**"
-      - "!.github/workflows/CICD.yml"
+    branches: [main]
   pull_request:
-    paths-ignore:
-      - "**.md"
-      - ".gitignore"
-      - ".github/**"
-      - "!.github/workflows/CICD.yml"
 
 jobs:
   lint:
