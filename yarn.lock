@@ -1335,6 +1335,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"axios@npm:0.26.0":
+  version: 0.26.0
+  resolution: "axios@npm:0.26.0"
+  dependencies:
+    follow-redirects: ^1.14.8
+  checksum: d7a8b898f4157bedeb2e06c03b16133b91b354c041205bea732ce58b7a21f373d22057b0eea0d482838145ce6ff482b359750d9bcb8dd19d45e3928e3c65c280
+  languageName: node
+  linkType: hard
+
 "axios@npm:^0.21.1":
   version: 0.21.4
   resolution: "axios@npm:0.21.4"
@@ -2743,13 +2752,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"follow-redirects@npm:^1.14.0":
-  version: 1.14.5
-  resolution: "follow-redirects@npm:1.14.5"
+"follow-redirects@npm:^1.14.0, follow-redirects@npm:^1.14.8":
+  version: 1.14.9
+  resolution: "follow-redirects@npm:1.14.9"
   peerDependenciesMeta:
     debug:
       optional: true
-  checksum: f004a76b2ee3a849772c2816e30928253bf47537b0f00184d89f4966413add96a228a4d96ca8c702bc045a683c52c2ba41545c915cc1a5e33bf8fd9d07b59aee
+  checksum: f5982e0eb481818642492d3ca35a86989c98af1128b8e1a62911a3410621bc15d2b079e8170b35b19d3bdee770b73ed431a257ed86195af773771145baa57845
   languageName: node
   linkType: hard
 
@@ -3435,6 +3444,7 @@ fsevents@~2.3.2:
     "@tsconfig/node16": 1.0.2
     "@types/node": 16.11.11
     "@types/web-push": 3.3.2
+    axios: 0.26.0
     bottleneck: 2.19.5
     dotenv: 10.0.0
     eslint: 8.4.0

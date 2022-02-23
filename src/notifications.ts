@@ -1,3 +1,4 @@
+import Axios, { AxiosError } from "axios"
 import Bottleneck from "bottleneck"
 import * as WebPush from "web-push"
 import { WebPushError } from "web-push"
@@ -16,37 +17,81 @@ WebPush.setVapidDetails(
   process.env.VAPID_PRIVATE_KEY as string,
 )
 
-const pushLimiter = new Bottleneck({
+const webPushLimiter = new Bottleneck({
   maxConcurrent: 50,
+})
+
+const discordLimiter = new Bottleneck({
+  maxConcurrent: 25,
+  reservoir: 25,
+  reservoirRefreshAmount: 25,
+  reservoirIncreaseInterval: 500,
+  reservoirIncreaseMaximum: 50,
 })
 
 const isTruthy = <T>(input: T | false | null | undefined): input is T => !!input
 
-export const sendWebPushNotification = async (
+const sendDiscordNotification = async (endpoint: string, patch: PushEventPatch) => {
+  const buttons = patch.links.map((link) => ({
+    type: 2,
+    style: 5,
+    label: link.includes("/patches/")
+      ? "Check out the patch notes!"
+      : "Check out the patch website!",
+    url: link,
+  }))
+
+  return discordLimiter
+    .schedule(() =>
+      Axios.post(endpoint, {
+        content: `**${patch.id} has been released!**`,
+        components: [
+          {
+            type: 1,
+            components: buttons,
+          },
+        ],
+      }),
+    )
+    .then(() => endpoint)
+    .catch((error: AxiosError | Error) => error)
+}
+
+const sendWebPushNotification = async (
+  endpoint: string,
+  auth: string,
+  p256dh: string,
+  patchData: PushEventPatch,
+) =>
+  webPushLimiter
+    .schedule({ expiration: 10_000 }, () =>
+      WebPush.sendNotification(
+        {
+          endpoint,
+          keys: { auth, p256dh },
+        },
+        JSON.stringify(patchData),
+      ),
+    )
+    .then(() => endpoint)
+    .catch((error) => error as WebPushError | Error)
+
+export const sendNotifications = async (
   subscriptions: PatchSubscription[],
   patch: Patch,
 ) => {
   const promises: Array<Promise<string | WebPushError | Error>> = []
 
-  for (const { endpoint, auth, p256dh } of subscriptions) {
+  for (const { type, endpoint, auth, extra } of subscriptions) {
     const patchData: PushEventPatch = {
       type: "patch",
       ...patch,
     }
 
     promises.push(
-      pushLimiter
-        .schedule({ expiration: 10_000 }, () =>
-          WebPush.sendNotification(
-            {
-              endpoint,
-              keys: { auth, p256dh },
-            },
-            JSON.stringify(patchData),
-          ),
-        )
-        .then(() => endpoint)
-        .catch((error) => error as WebPushError | Error),
+      type === "push"
+        ? sendWebPushNotification(endpoint, auth, extra as string, patchData)
+        : sendDiscordNotification(endpoint, patchData),
     )
   }
 
