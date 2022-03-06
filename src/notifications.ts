@@ -8,7 +8,11 @@ import { captureException } from "@sentry/node"
 import { Patch, PushEventPatch, PatchSubscription } from "../src/types"
 
 import { Logger } from "./logger"
-import { handleSendErrors, handleSentNotifications } from "./supabase"
+import {
+  handleWebPushSendErrors,
+  handleSentNotifications,
+  handleDiscordSendErrors,
+} from "./supabase"
 
 WebPush.setGCMAPIKey(process.env.GCM_API_KEY as string)
 WebPush.setVapidDetails(
@@ -80,7 +84,7 @@ export const sendNotifications = async (
   subscriptions: PatchSubscription[],
   patch: Patch,
 ) => {
-  const promises: Array<Promise<string | WebPushError | Error>> = []
+  const promises: Array<Promise<string | WebPushError | AxiosError | Error>> = []
 
   for (const { type, endpoint, auth, extra } of subscriptions) {
     const patchData: PushEventPatch = {
@@ -104,12 +108,17 @@ export const sendNotifications = async (
   const webPushErrors = results.filter(
     (result): result is WebPushError => result instanceof WebPushError,
   )
+  const axiosErrors = results.filter(
+    (result): result is AxiosError => (result as AxiosError).isAxiosError,
+  )
   const successful = results.filter(
     (result): result is string => typeof result === "string",
   )
 
   Logger.info(
-    `Tried to send ${results.length} notifications. (OK: ${successful.length}, FAIL: ${webPushErrors.length})`,
+    `Tried to send ${results.length} notifications. (OK: ${successful.length}, FAIL: ${
+      webPushErrors.length + axiosErrors.length
+    })`,
   )
 
   for (const error of errors) {
@@ -119,7 +128,8 @@ export const sendNotifications = async (
   await Promise.all(
     [
       successful.length > 0 && handleSentNotifications(successful, patch),
-      webPushErrors.length > 0 && handleSendErrors(webPushErrors),
+      webPushErrors.length > 0 && handleWebPushSendErrors(webPushErrors),
+      axiosErrors.length > 0 && handleDiscordSendErrors(axiosErrors),
     ].filter(isTruthy),
   )
 }

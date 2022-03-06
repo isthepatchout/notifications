@@ -18,7 +18,7 @@ export type PatchSubscription = {
   auth: string
   extra: string | null
   environment: string
-  lastNotified: Patch["id"]
+  lastNotified: Patch["number"]
 }
 
 export type PushEventPatch = Patch & {
