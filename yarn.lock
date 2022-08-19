@@ -848,13 +848,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bottleneck@npm:2.19.5":
-  version: 2.19.5
-  resolution: "bottleneck@npm:2.19.5"
-  checksum: c5eef1bbea12cef1f1405e7306e7d24860568b0f7ac5eeab706a86762b3fc65ef6d1c641c8a166e4db90f412fc5c948fc5ce8008a8cd3d28c7212ef9c3482bda
-  languageName: node
-  linkType: hard
-
 "brace-expansion@npm:^1.1.7":
   version: 1.1.11
   resolution: "brace-expansion@npm:1.1.11"
@@ -2906,7 +2899,6 @@ fsevents@~2.3.2:
     "@types/node": 16.11.49
     "@types/web-push": 3.3.2
     axios: 0.26.0
-    bottleneck: 2.19.5
     dotenv: 16.0.1
     eslint: 8.22.0
     lint-staged: 13.0.3
