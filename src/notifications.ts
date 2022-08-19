@@ -5,14 +5,13 @@ import { WebPushError } from "web-push"
 
 import { captureException } from "@sentry/node"
 
-import { Patch, PushEventPatch, PatchSubscription } from "../src/types"
-
 import { Logger } from "./logger"
 import {
   handleWebPushSendErrors,
   handleSentNotifications,
   handleDiscordSendErrors,
 } from "./supabase"
+import type { Patch, PushEventPatch, PushSubscription } from "./types"
 
 WebPush.setGCMAPIKey(process.env.GCM_API_KEY as string)
 WebPush.setVapidDetails(
@@ -81,7 +80,7 @@ const sendWebPushNotification = async (
     .catch((error) => error as WebPushError | Error)
 
 export const sendNotifications = async (
-  subscriptions: PatchSubscription[],
+  subscriptions: PushSubscription[],
   patch: Patch,
 ) => {
   const promises: Array<Promise<string | WebPushError | AxiosError | Error>> = []

@@ -1,24 +1,24 @@
-import { SupabaseRealtimePayload } from "@supabase/supabase-js"
-
 import { Logger } from "./logger"
 import { sendNotifications } from "./notifications"
 import { getUnnotifiedSubscriptions, supabase } from "./supabase"
-import { Patch } from "./types"
+import { Patch, RealtimeChange } from "./types"
 
-const tableName = "patches"
+const tableName = "patches" as const
 
-const handler = async (event: SupabaseRealtimePayload<Patch>) => {
+const handler = async (event: RealtimeChange<typeof tableName>) => {
   Logger.debug(event)
 
-  if (event.old.releasedAt != null) {
-    return Logger.info(`Dismissing update to '${event.new.id}' - was already released.`)
+  if (event.old_record?.releasedAt != null) {
+    return Logger.info(
+      `Dismissing update to '${event.record!.id}' - was already released.`,
+    )
   }
 
-  Logger.info(`'${event.new.id}' was just released!`)
+  Logger.info(`'${event.record!.id}' was just released!`)
 
   let remaining = Number.POSITIVE_INFINITY
   do {
-    remaining = await sendNotificationsInBatches(event.new)
+    remaining = await sendNotificationsInBatches(event.record!)
   } while (remaining > 1)
 }
 
@@ -35,6 +35,17 @@ const sendNotificationsInBatches = async (patch: Patch): Promise<number> => {
 export const initListener = () => {
   Logger.info(`Listening for UPDATE:s to '${tableName}'...`)
 
-  // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  supabase.from<Patch>(tableName).on("UPDATE", handler).subscribe()
+  const channel = supabase.channel(`public:${tableName}`)
+
+  channel
+    .on(
+      "postgres_changes",
+      {
+        event: "UPDATE",
+        schema: "public",
+        table: "patches",
+      },
+      handler,
+    )
+    .subscribe()
 }

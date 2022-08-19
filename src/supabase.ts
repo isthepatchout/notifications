@@ -5,18 +5,18 @@ import { WebPushError } from "web-push"
 import { SupabaseClient } from "@supabase/supabase-js"
 
 import { Logger } from "./logger"
-import { Patch, PatchSubscription } from "./types"
+import { Patch, Database } from "./types"
 
 Dotenv.config()
 
-export const supabase = new SupabaseClient(
+export const supabase = new SupabaseClient<Database>(
   process.env.SUPABASE_URL as string,
   process.env.SUPABASE_SERVICE_KEY as string,
 )
 
 export const handleSentNotifications = async (endpoints: string[], patch: Patch) => {
   await supabase
-    .from<PatchSubscription>("subscriptions")
+    .from("subscriptions")
     .update({ lastNotified: patch.number })
     .in("endpoint", endpoints)
 }
@@ -29,7 +29,7 @@ export const handleWebPushSendErrors = async (errors: WebPushError[]) => {
   Logger.info(`${expired.length} Web Push subscriptions have expired.`)
 
   await supabase
-    .from<PatchSubscription>("subscriptions")
+    .from("subscriptions")
     .delete()
     .in(
       "endpoint",
@@ -49,7 +49,7 @@ export const handleDiscordSendErrors = async (errors: AxiosError[]) => {
   Logger.info(`${expired.length} Discord subscriptions have expired.`)
 
   await supabase
-    .from<PatchSubscription>("subscriptions")
+    .from("subscriptions")
     .delete()
     .in(
       "endpoint",
@@ -63,7 +63,7 @@ export const handleDiscordSendErrors = async (errors: AxiosError[]) => {
 
 export const getUnnotifiedSubscriptions = async (patch: Patch) => {
   const { data, error, count } = await supabase
-    .from<PatchSubscription>("subscriptions")
+    .from("subscriptions")
     .select("*", { count: "exact" })
     .eq("environment", process.env.NODE_ENV as string)
     .lt("lastNotified", patch.number)
