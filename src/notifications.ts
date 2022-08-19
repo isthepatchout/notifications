@@ -1,5 +1,5 @@
 import Axios, { AxiosError } from "axios"
-import Bottleneck from "bottleneck"
+import PQueue from "p-queue"
 import * as WebPush from "web-push"
 import { WebPushError } from "web-push"
 
@@ -20,16 +20,16 @@ WebPush.setVapidDetails(
   process.env.VAPID_PRIVATE_KEY as string,
 )
 
-const webPushLimiter = new Bottleneck({
-  maxConcurrent: 50,
+const webPushLimiter = new PQueue({
+  timeout: 10_000,
+  concurrency: 33,
 })
 
-const discordLimiter = new Bottleneck({
-  maxConcurrent: 25,
-  reservoir: 25,
-  reservoirRefreshAmount: 25,
-  reservoirIncreaseInterval: 500,
-  reservoirIncreaseMaximum: 50,
+const discordLimiter = new PQueue({
+  timeout: 2000,
+  concurrency: 25,
+  interval: 500,
+  intervalCap: 25,
 })
 
 const isTruthy = <T>(input: T | false | null | undefined): input is T => !!input
@@ -45,7 +45,7 @@ const sendDiscordNotification = async (endpoint: string, patch: PushEventPatch) 
   }))
 
   return discordLimiter
-    .schedule(() =>
+    .add(() =>
       Axios.post(endpoint, {
         content: `**${patch.id} has been released!**`,
         components: [
@@ -67,7 +67,7 @@ const sendWebPushNotification = async (
   patchData: PushEventPatch,
 ) =>
   webPushLimiter
-    .schedule({ expiration: 10_000 }, () =>
+    .add(() =>
       WebPush.sendNotification(
         {
           endpoint,
