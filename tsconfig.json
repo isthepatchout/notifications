@@ -25,9 +25,5 @@
     "lib": ["es2020"],
     "types": ["node"]
   },
-  "ts-node": {
-    "files": true,
-    "require": ["dotenv/config"]
-  },
   "include": ["src/**/*.ts"]
 }

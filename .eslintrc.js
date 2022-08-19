@@ -6,9 +6,8 @@ module.exports = {
   },
   extends: [
     "plugin:@beequeue/base",
-    "plugin:@beequeue/vue",
+    "plugin:@beequeue/node",
     "plugin:@beequeue/typescript",
-    "plugin:@beequeue/prettier",
   ],
   rules: {
     "@typescript-eslint/no-non-null-assertion": "off",

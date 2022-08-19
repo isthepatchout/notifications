@@ -1,10 +1,13 @@
 import { AxiosError } from "axios"
+import Dotenv from "dotenv"
 import { WebPushError } from "web-push"
 
 import { SupabaseClient } from "@supabase/supabase-js"
 
 import { Logger } from "./logger"
 import { Patch, PatchSubscription } from "./types"
+
+Dotenv.config()
 
 export const supabase = new SupabaseClient(
   process.env.SUPABASE_URL as string,
@@ -70,5 +73,5 @@ export const getUnnotifiedSubscriptions = async (patch: Patch) => {
     throw new Error(error.message)
   }
 
-  return { subscriptions: data!, count: count! }
+  return { subscriptions: data, count: count! }
 }
