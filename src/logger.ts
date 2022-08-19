@@ -1,5 +1,4 @@
 import Pino from "pino"
-import { createWriteStream } from "pino-logflare"
 import pretty from "pino-pretty"
 
 const isDev = process.env.NODE_ENV === "development"
@@ -12,13 +11,10 @@ export const Logger = Pino(
     },
   },
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-  !isDev
-    ? createWriteStream({
-        apiKey: process.env.LOGFLARE_API_KEY!,
-        sourceToken: "a1bdc121-06ff-49ed-af26-5295a039d8f8",
-      })
-    : pretty({
+  isDev
+    ? pretty({
         colorize: true,
         ignore: "source",
-      }),
+      })
+    : (undefined as any),
 )
