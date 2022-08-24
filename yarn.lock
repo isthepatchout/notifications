@@ -288,12 +288,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@supabase/gotrue-js@npm:^2.0.0-rc.2":
-  version: 2.0.0-rc.2
-  resolution: "@supabase/gotrue-js@npm:2.0.0-rc.2"
+"@supabase/gotrue-js@npm:^2.0.0-rc.3":
+  version: 2.0.0-rc.3
+  resolution: "@supabase/gotrue-js@npm:2.0.0-rc.3"
   dependencies:
     cross-fetch: ^3.1.5
-  checksum: 420277ad81e1a67efce81d455068ab6f42b180d41580ebde103221bfdb68d2966029ae88defdef146b197275930e4d817039311a56f5c34f1aa47e507796644c
+  checksum: 2683756294c964ec13f1a72a11253f261025e6631a41084a7ea66a6265fcc96edb2d7202cf3c69b1f0da8a772519cfa100540d8f71f2b82e0c2dddeed8e755f6
   languageName: node
   linkType: hard
 
@@ -306,13 +306,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@supabase/realtime-js@npm:^2.0.0-rc.2":
-  version: 2.0.0-rc.3
-  resolution: "@supabase/realtime-js@npm:2.0.0-rc.3"
+"@supabase/realtime-js@npm:^2.0.0-rc.5":
+  version: 2.0.0-rc.5
+  resolution: "@supabase/realtime-js@npm:2.0.0-rc.5"
   dependencies:
     "@types/phoenix": ^1.5.4
     websocket: ^1.0.34
-  checksum: d66deb484f5d17d6c7bbf2ff574a5fe965d909190c3c9435d3c0f7913020a07b7a1c2047293abc88f0c00886eae7a51dca4ef563d778b198a2e206b824b77c76
+  checksum: 8b26da51fb6956c1dd2216fe3929f06f0a377102ea79e94be8fcdb57f63786acb437a4ab673638c0d7739ce15db7f7ef99fe229c0f9e823ae91c9d4042f17308
   languageName: node
   linkType: hard
 
@@ -325,17 +325,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@supabase/supabase-js@npm:2.0.0-rc.3":
-  version: 2.0.0-rc.3
-  resolution: "@supabase/supabase-js@npm:2.0.0-rc.3"
+"@supabase/supabase-js@npm:2.0.0-rc.6":
+  version: 2.0.0-rc.6
+  resolution: "@supabase/supabase-js@npm:2.0.0-rc.6"
   dependencies:
     "@supabase/functions-js": ^2.0.0-rc.1
-    "@supabase/gotrue-js": ^2.0.0-rc.2
+    "@supabase/gotrue-js": ^2.0.0-rc.3
     "@supabase/postgrest-js": ^1.0.0-rc.1
-    "@supabase/realtime-js": ^2.0.0-rc.2
+    "@supabase/realtime-js": ^2.0.0-rc.5
     "@supabase/storage-js": ^2.0.0-rc.1
     cross-fetch: ^3.1.5
-  checksum: 2fc2267e765f3e53fca2e1d40c51d173ec978fc30683bbeae08fb217884e5b4ac64dd324d6614a0353ad70ec8b8d133f176d353c69fe0c2124d25c4cc669acf3
+  checksum: 5d87895a077d5c02ba93ff54907cc12b0d4e213267ad92102361e298dc995ceef2f49b86ffd1f9204a6c3c5eda1819a1e36d34ed2c0730453a008d0a9e726bdd
   languageName: node
   linkType: hard
 
@@ -2820,7 +2820,7 @@ fsevents@~2.3.2:
   dependencies:
     "@beequeue/eslint-plugin": 0.7.0
     "@sentry/node": 7.11.1
-    "@supabase/supabase-js": 2.0.0-rc.3
+    "@supabase/supabase-js": 2.0.0-rc.6
     "@tsconfig/node16": 1.0.3
     "@types/node": 16.11.49
     "@types/web-push": 3.3.2
