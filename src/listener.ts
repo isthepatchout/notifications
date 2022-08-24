@@ -8,17 +8,15 @@ const tableName = "patches" as const
 const handler = async (event: RealtimeChange<typeof tableName>) => {
   Logger.debug(event)
 
-  if (event.old_record?.releasedAt != null) {
-    return Logger.info(
-      `Dismissing update to '${event.record!.id}' - was already released.`,
-    )
+  if (event.old?.releasedAt != null) {
+    return Logger.info(`Dismissing update to '${event.new!.id}' - was already released.`)
   }
 
-  Logger.info(`'${event.record!.id}' was just released!`)
+  Logger.info(`'${event.new!.id}' was just released!`)
 
   let remaining = Number.POSITIVE_INFINITY
   do {
-    remaining = await sendNotificationsInBatches(event.record!)
+    remaining = await sendNotificationsInBatches(event.new!)
   } while (remaining > 1)
 }
 

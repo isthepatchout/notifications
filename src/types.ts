@@ -10,12 +10,12 @@ export type PushEventPatch = Patch & {
 }
 
 export type RealtimeChange<Table extends keyof Database["public"]["Tables"]> = {
-  columns: Array<{ name: string; type: string }>
-  commit_timestamp: string
-  record?: Database["public"]["Tables"][Table]["Row"]
-  old_record?: Database["public"]["Tables"][Table]["Row"]
-  schema: keyof Database
+  eventType: "INSERT" | "UPDATE" | "DELETE"
   table: Table
-  errors: unknown
-  type: "INSERT" | "UPDATE" | "DELETE"
+  new?: Database["public"]["Tables"][Table]["Row"]
+  old?: Database["public"]["Tables"][Table]["Row"]
+  commit_timestamp: string
+  // schema: keyof Database
+  // columns: Array<{ name: string; type: string }>
+  errors: unknown[] | null
 }
