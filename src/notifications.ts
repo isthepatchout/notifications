@@ -47,7 +47,7 @@ const sendDiscordNotification = async (endpoint: string, patch: PushEventPatch) 
   return discordLimiter
     .add(() =>
       Axios.post(endpoint, {
-        content: `**${patch.id} has been released!**\n_Apologies for the delay in notifaction due to misconfiguration._`,
+        content: `**${patch.id} has been released!**`,
         components: [
           {
             type: 1,
