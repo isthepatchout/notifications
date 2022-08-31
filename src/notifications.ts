@@ -1,5 +1,6 @@
 import Axios, { AxiosError } from "axios"
 import PQueue from "p-queue"
+import { isTruthy } from "remeda"
 import * as WebPush from "web-push"
 import { WebPushError } from "web-push"
 
@@ -31,8 +32,6 @@ const discordLimiter = new PQueue({
   interval: 500,
   intervalCap: 25,
 })
-
-const isTruthy = <T>(input: T | false | null | undefined): input is T => !!input
 
 const sendDiscordNotification = async (endpoint: string, patch: PushEventPatch) => {
   const buttons = patch.links.map((link) => ({
