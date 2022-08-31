@@ -33,7 +33,7 @@ const sendNotificationsInBatches = async (patch: Patch): Promise<number> => {
 }
 
 export const initListener = () => {
-  Logger.info(`Listening for UPDATE:s to '${tableName}'...`)
+  Logger.info(`Listening for INSERT:s on '${tableName}'...`)
 
   const channel = supabase.channel(`public:${tableName}`)
 
@@ -41,7 +41,7 @@ export const initListener = () => {
     .on(
       "postgres_changes",
       {
-        event: "UPDATE",
+        event: "INSERT",
         schema: "public",
         table: "patches",
       },
