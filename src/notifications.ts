@@ -1,4 +1,4 @@
-import Axios, { AxiosError } from "axios"
+import { mande, MandeError } from "mande"
 import PQueue from "p-queue"
 import { isTruthy } from "remeda"
 import * as WebPush from "web-push"
@@ -45,7 +45,7 @@ const sendDiscordNotification = async (endpoint: string, patch: PushEventPatch) 
 
   return discordLimiter
     .add(() =>
-      Axios.post(endpoint, {
+      mande(endpoint).post({
         content: `**${patch.id} has been released!**`,
         components: [
           {
@@ -56,7 +56,7 @@ const sendDiscordNotification = async (endpoint: string, patch: PushEventPatch) 
       }),
     )
     .then(() => endpoint)
-    .catch((error: AxiosError | Error) => error)
+    .catch((error: MandeError | Error) => error)
 }
 
 const sendWebPushNotification = async (
@@ -82,7 +82,7 @@ export const sendNotifications = async (
   subscriptions: PushSubscription[],
   patch: Patch,
 ) => {
-  const promises: Array<Promise<string | WebPushError | AxiosError | Error>> = []
+  const promises: Array<Promise<string | WebPushError | MandeError | Error>> = []
 
   for (const { type, endpoint, auth, extra } of subscriptions) {
     const patchData: PushEventPatch = {
@@ -106,8 +106,8 @@ export const sendNotifications = async (
   const webPushErrors = results.filter(
     (result): result is WebPushError => result instanceof WebPushError,
   )
-  const axiosErrors = results.filter(
-    (result): result is AxiosError => (result as AxiosError).isAxiosError,
+  const mandeErrors = results.filter(
+    (result): result is MandeError => (result as MandeError).response != null,
   )
   const successful = results.filter(
     (result): result is string => typeof result === "string",
@@ -115,7 +115,7 @@ export const sendNotifications = async (
 
   Logger.info(
     `Tried to send ${results.length} notifications. (OK: ${successful.length}, FAIL: ${
-      webPushErrors.length + axiosErrors.length
+      webPushErrors.length + mandeErrors.length
     })`,
   )
 
@@ -127,7 +127,7 @@ export const sendNotifications = async (
     [
       successful.length > 0 && handleSentNotifications(successful, patch),
       webPushErrors.length > 0 && handleWebPushSendErrors(webPushErrors),
-      axiosErrors.length > 0 && handleDiscordSendErrors(axiosErrors),
+      mandeErrors.length > 0 && handleDiscordSendErrors(mandeErrors),
     ].filter(isTruthy),
   )
 }

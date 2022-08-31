@@ -1,5 +1,5 @@
-import { AxiosError } from "axios"
 import Dotenv from "dotenv"
+import { MandeError } from "mande"
 import { WebPushError } from "web-push"
 
 import { SupabaseClient } from "@supabase/supabase-js"
@@ -41,7 +41,7 @@ export const handleWebPushSendErrors = async (errors: WebPushError[]) => {
   }
 }
 
-export const handleDiscordSendErrors = async (errors: AxiosError[]) => {
+export const handleDiscordSendErrors = async (errors: MandeError[]) => {
   Logger.debug(errors)
 
   const expired = errors.filter((error) => error.response?.status === 404)
@@ -53,7 +53,7 @@ export const handleDiscordSendErrors = async (errors: AxiosError[]) => {
     .delete()
     .in(
       "endpoint",
-      expired.filter(Boolean).map((error) => error.config!.url!),
+      expired.filter(Boolean).map((error) => error.response.url!),
     )
 
   if (rest.length > 0) {
