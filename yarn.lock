@@ -367,10 +367,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:16.11.56":
-  version: 16.11.56
-  resolution: "@types/node@npm:16.11.56"
-  checksum: b4efade16eb08a39810921c54a1637e69c8f3184a20d87e8fe74d557d9bda73f0829ac318e2a30a32b1903e4b099812defd1dfe438be70b98dbfbea5b0d99a53
+"@types/node@npm:18.7.14":
+  version: 18.7.14
+  resolution: "@types/node@npm:18.7.14"
+  checksum: 99cf28ff854100158de875cca23c7acc3cc01dfee526a52b90b7f36767c821bcbaf2be0a98a70f06f3b78f3c60639168ff949d725b61e2e124f9f71f1fb8043d
   languageName: node
   linkType: hard
 
@@ -2857,7 +2857,7 @@ fsevents@~2.3.2:
     "@sentry/node": 7.11.1
     "@supabase/supabase-js": 2.0.0-rc.8
     "@tsconfig/node16": 1.0.3
-    "@types/node": 16.11.56
+    "@types/node": 18.7.14
     "@types/web-push": 3.3.2
     axios: 0.27.2
     dotenv: 16.0.2
