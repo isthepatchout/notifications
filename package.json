@@ -23,28 +23,28 @@
     "typecheck": "tsc --noEmit --project tsconfig.json"
   },
   "resolutions": {
-    "@types/node": "16.11.49"
+    "@types/node": "16.11.56"
   },
   "dependencies": {
     "@sentry/node": "7.11.1",
-    "@supabase/supabase-js": "2.0.0-rc.6",
-    "axios": "0.26.0",
-    "dotenv": "16.0.1",
+    "@supabase/supabase-js": "2.0.0-rc.8",
+    "axios": "0.27.2",
+    "dotenv": "16.0.2",
     "p-queue": "6.6.2",
-    "pino": "7.8.0",
-    "pino-pretty": "7.5.1",
-    "web-push": "3.4.5"
+    "pino": "7.11.0",
+    "pino-pretty": "7.6.1",
+    "web-push": "3.5.0"
   },
   "devDependencies": {
     "@beequeue/eslint-plugin": "0.7.0",
     "@tsconfig/node16": "1.0.3",
-    "@types/node": "16.11.49",
+    "@types/node": "16.11.56",
     "@types/web-push": "3.3.2",
     "eslint": "8.22.0",
     "lint-staged": "13.0.3",
     "prettier": "2.7.1",
     "simple-git-hooks": "2.8.0",
-    "tsx": "3.8.2",
-    "typescript": "4.7.4"
+    "tsx": "3.9.0",
+    "typescript": "4.8.2"
   }
 }

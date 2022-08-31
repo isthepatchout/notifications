@@ -53,7 +53,7 @@ export const handleDiscordSendErrors = async (errors: AxiosError[]) => {
     .delete()
     .in(
       "endpoint",
-      expired.filter(Boolean).map((error) => error.config.url!),
+      expired.filter(Boolean).map((error) => error.config!.url!),
     )
 
   if (rest.length > 0) {
