@@ -346,10 +346,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tsconfig/node16@npm:1.0.3":
-  version: 1.0.3
-  resolution: "@tsconfig/node16@npm:1.0.3"
-  checksum: 3a8b657dd047495b7ad23437d6afd20297ce90380ff0bdee93fc7d39a900dbd8d9e26e53ff6b465e7967ce2adf0b218782590ce9013285121e6a5928fbd6819f
+"@tsconfig/node18@npm:1.0.1":
+  version: 1.0.1
+  resolution: "@tsconfig/node18@npm:1.0.1"
+  checksum: aba11b453e40b03a33321e5b2bd51ba2d5213503bb95f1ecd56a5dd0be31eef1ab9ddfe06b4eae99075692641de905d57a38d671a9288bacac82327d393de1e2
   languageName: node
   linkType: hard
 
@@ -2802,7 +2802,7 @@ fsevents@~2.3.2:
     "@beequeue/eslint-plugin": 0.7.0
     "@sentry/node": 7.11.1
     "@supabase/supabase-js": 2.0.0-rc.8
-    "@tsconfig/node16": 1.0.3
+    "@tsconfig/node18": 1.0.1
     "@types/node": 18.7.14
     "@types/web-push": 3.3.2
     dotenv: 16.0.2

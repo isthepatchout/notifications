@@ -120,7 +120,9 @@ export const sendNotifications = async (
   )
 
   for (const error of errors) {
-    captureException(new Error(`Failed to send notification: ${error.message}`))
+    captureException(
+      new Error(`Failed to send notification: ${error.message}`, { cause: error }),
+    )
   }
 
   await Promise.all(
