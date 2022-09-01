@@ -14,6 +14,28 @@ export const supabase = new SupabaseClient<Database>(
   process.env.SUPABASE_SERVICE_KEY as string,
 )
 
+export const doNotificationSanityCheck = async (endpoints: string[], patch: Patch) => {
+  const { error, count } = await supabase
+    .from("subscriptions")
+    .select("lastNotified", { count: "exact" })
+    .in("endpoint", endpoints)
+    .eq("lastNotified", patch.number)
+
+  if (error != null) {
+    Logger.error(error, "Failed to fetch sanity check data")
+    // eslint-disable-next-line n/no-process-exit,unicorn/no-process-exit
+    process.exit(1)
+  }
+
+  if (count !== endpoints.length) {
+    Logger.error(
+      "A subscription's last notification was not updated as it should've been!! Pulling plug.",
+    )
+    // eslint-disable-next-line n/no-process-exit,unicorn/no-process-exit
+    process.exit(1)
+  }
+}
+
 export const handleSentNotifications = async (endpoints: string[], patch: Patch) => {
   await supabase
     .from("subscriptions")
@@ -67,7 +89,7 @@ export const getUnnotifiedSubscriptions = async (patch: Patch) => {
     .select("*", { count: "exact" })
     .eq("environment", process.env.NODE_ENV as string)
     .lt("lastNotified", patch.number)
-    .limit(100)
+    .limit(50)
 
   if (error) {
     throw new Error(error.message)

@@ -11,6 +11,7 @@ import {
   handleWebPushSendErrors,
   handleSentNotifications,
   handleDiscordSendErrors,
+  doNotificationSanityCheck,
 } from "./supabase"
 import type { Patch, PushEventPatch, PushSubscription } from "./types"
 
@@ -131,5 +132,10 @@ export const sendNotifications = async (
       webPushErrors.length > 0 && handleWebPushSendErrors(webPushErrors),
       mandeErrors.length > 0 && handleDiscordSendErrors(mandeErrors),
     ].filter(isTruthy),
+  )
+
+  await doNotificationSanityCheck(
+    subscriptions.map((s) => s.endpoint),
+    patch,
   )
 }
