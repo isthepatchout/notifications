@@ -55,7 +55,7 @@ export const queries = {
 
     const { data: rows, error: rowsError } = await base
       .select()
-      .limit(50)
+      .limit(333)
       .then((data) => ({
         data,
         error: null,
