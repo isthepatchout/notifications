@@ -33,8 +33,8 @@
     "mande": "2.0.3",
     "p-queue": "6.6.2",
     "pg": "8.8.0",
-    "pino": "7.11.0",
-    "pino-pretty": "7.6.1",
+    "pino": "8.4.2",
+    "pino-pretty": "9.1.0",
     "remeda": "1.1.0",
     "web-push": "3.5.0"
   },
