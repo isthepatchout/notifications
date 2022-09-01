@@ -1,6 +1,5 @@
 import { mande, MandeError } from "mande"
 import PQueue from "p-queue"
-import { isTruthy } from "remeda"
 import * as WebPush from "web-push"
 import { WebPushError } from "web-push"
 
@@ -8,10 +7,9 @@ import { captureException } from "@sentry/node"
 
 import { Logger } from "./logger"
 import {
-  handleWebPushSendErrors,
-  handleSentNotifications,
   handleDiscordSendErrors,
-  doNotificationSanityCheck,
+  handleSentNotifications,
+  handleWebPushSendErrors,
 } from "./supabase"
 import type { Patch, PushEventPatch, PushSubscription } from "./types"
 
@@ -126,16 +124,20 @@ export const sendNotifications = async (
     )
   }
 
-  await Promise.all(
-    [
-      successful.length > 0 && handleSentNotifications(successful, patch),
-      webPushErrors.length > 0 && handleWebPushSendErrors(webPushErrors),
-      mandeErrors.length > 0 && handleDiscordSendErrors(mandeErrors),
-    ].filter(isTruthy),
-  )
+  const [updatedEndpoints] = await Promise.all([
+    handleSentNotifications(successful, patch),
+    handleWebPushSendErrors(webPushErrors),
+    handleDiscordSendErrors(mandeErrors),
+  ] as const)
 
-  await doNotificationSanityCheck(
-    subscriptions.map((s) => s.endpoint),
-    patch,
-  )
+  if (updatedEndpoints.length !== subscriptions.length) {
+    Logger.error(
+      "A subscription's last notification was not updated as it should've been!! Pulling plug.",
+    )
+    captureException(
+      "A subscription's last notification was not updated as it should've been!! Pulling plug.",
+    )
+    // eslint-disable-next-line n/no-process-exit,unicorn/no-process-exit
+    process.exit(1)
+  }
 }

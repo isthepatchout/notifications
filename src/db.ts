@@ -1,5 +1,6 @@
 import Knex from "knex"
 
+import { Logger } from "./logger"
 import type { Patch, PushSubscription } from "./types"
 
 declare module "knex/types/tables" {
@@ -23,15 +24,68 @@ export const knex = Knex({
 })
 
 export const queries = {
-  sanityCheck: (endpoints: string[], patch: Patch) =>
-    knex("subscriptions")
-      .count("lastNotified")
+  updateNotifiedSubscriptions: async (endpoints: string[], patch: Patch) => {
+    Logger.debug(
+      { patch: patch.id, endpoints: endpoints.length },
+      "Updating notified subscriptions...",
+    )
+
+    const result = await knex("subscriptions")
+      .update({ lastNotified: patch.number }, ["endpoint"])
       .whereIn("endpoint", endpoints)
-      .where({ lastNotified: patch.number })
+      .then((updated) => updated)
+
+    Logger.debug({ count: result.length }, "Updated notified subscriptions...")
+
+    return result
+  },
+
+  deleteSubscriptions: (endpoints: string[]) => {
+    Logger.debug({ endpoints }, "Deleting subscriptions...")
+
+    return knex("subscriptions").delete().whereIn("endpoint", endpoints)
+  },
+
+  getUnnotifiedSubscriptions: async (patch: Patch) => {
+    Logger.debug({ patch: patch.id }, "Getting unnotified subscriptions...")
+
+    const base = knex("subscriptions")
+      .where("environment", process.env.NODE_ENV as string)
+      .andWhere("lastNotified", "<", patch.number)
+
+    const { data: rows, error: rowsError } = await base
+      .select()
+      .limit(50)
+      .then((data) => ({
+        data,
+        error: null,
+      }))
+      .catch((error: Error) => ({ data: null, error }))
+
+    const { count, error: countError } = await base
+      .count()
       .first()
       .then((data) => ({
         count: Number((data as { count: string })?.count),
         error: null,
       }))
-      .catch((error: Error) => ({ count: null, error })),
+      .catch((error: Error) => ({ count: null, error }))
+
+    if (rowsError != null || countError != null) {
+      Logger.error(rowsError ?? countError, "Failed to get unnotified subscriptions.")
+
+      return {
+        data: null,
+        count: null,
+        error: rowsError ?? countError,
+      }
+    }
+
+    Logger.debug({ count, rows: rows.length }, "Got unnotified subscriptions.")
+    return {
+      data: rows,
+      count,
+      error: null,
+    }
+  },
 }
