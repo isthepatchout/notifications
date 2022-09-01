@@ -45,7 +45,7 @@ export const handleDiscordSendErrors = async (errors: MandeError[]) => {
   Logger.info(`${expired.length} Discord subscriptions have expired.`)
 
   await queries.deleteSubscriptions(
-    expired.filter(isTruthy).map((error) => error.response.url),
+    expired.filter(isTruthy).map((error) => error.response.url as string),
   )
 
   if (rest.length > 0) {
@@ -60,5 +60,5 @@ export const getUnnotifiedSubscriptions = async (patch: Patch) => {
     throw new Error(error.message)
   }
 
-  return { subscriptions: data, count: count! }
+  return { subscriptions: data!, count: count! }
 }
