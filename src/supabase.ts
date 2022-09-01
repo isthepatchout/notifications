@@ -1,13 +1,11 @@
-import Dotenv from "dotenv"
 import { MandeError } from "mande"
 import { WebPushError } from "web-push"
 
 import { SupabaseClient } from "@supabase/supabase-js"
 
+import { queries } from "./db"
 import { Logger } from "./logger"
 import { Patch, Database } from "./types"
-
-Dotenv.config()
 
 export const supabase = new SupabaseClient<Database>(
   process.env.SUPABASE_URL as string,
@@ -15,11 +13,7 @@ export const supabase = new SupabaseClient<Database>(
 )
 
 export const doNotificationSanityCheck = async (endpoints: string[], patch: Patch) => {
-  const { error, count } = await supabase
-    .from("subscriptions")
-    .select("lastNotified", { count: "exact" })
-    .in("endpoint", endpoints)
-    .eq("lastNotified", patch.number)
+  const { count, error } = await queries.sanityCheck(endpoints, patch)
 
   if (error != null) {
     Logger.error(error, "Failed to fetch sanity check data")
