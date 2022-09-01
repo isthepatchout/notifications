@@ -67,7 +67,7 @@ export const getUnnotifiedSubscriptions = async (patch: Patch) => {
     .select("*", { count: "exact" })
     .eq("environment", process.env.NODE_ENV as string)
     .lt("lastNotified", patch.number)
-    .limit(500)
+    .limit(100)
 
   if (error) {
     throw new Error(error.message)
