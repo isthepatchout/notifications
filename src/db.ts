@@ -1,4 +1,5 @@
 import Knex from "knex"
+import { identity } from "remeda"
 
 import { Logger } from "./logger"
 import type { Patch, PushSubscription } from "./types"
@@ -22,6 +23,9 @@ export const knex = Knex({
     max: 10,
   },
 })
+
+// Perform connection check
+void knex("patches").select("id").first().then(identity)
 
 export const queries = {
   updateNotifiedSubscriptions: async (endpoints: string[], patch: Patch) => {
