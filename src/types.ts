@@ -8,14 +8,3 @@ export type PushSubscription = Database["public"]["Tables"]["subscriptions"]["Ro
 export type PushEventPatch = Patch & {
   type: "patch"
 }
-
-export type RealtimeChange<Table extends keyof Database["public"]["Tables"]> = {
-  eventType: "INSERT" | "UPDATE" | "DELETE"
-  table: Table
-  record?: Database["public"]["Tables"][Table]["Row"]
-  old_record?: Database["public"]["Tables"][Table]["Row"]
-  commit_timestamp: string
-  schema: keyof Database
-  columns: Array<{ name: string; type: string }>
-  errors: unknown[] | null
-}

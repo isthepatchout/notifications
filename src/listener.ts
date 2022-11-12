@@ -1,24 +1,24 @@
+import type { RealtimePostgresInsertPayload } from "@supabase/realtime-js"
+
 import { Logger } from "./logger"
 import { sendNotifications } from "./notifications"
 import { getUnnotifiedSubscriptions, supabase } from "./supabase"
-import { Patch, RealtimeChange } from "./types"
+import { Patch } from "./types"
 
 const tableName = "patches" as const
 
-const handler = async (event: RealtimeChange<typeof tableName>) => {
+const handler = async (event: RealtimePostgresInsertPayload<Patch>) => {
   Logger.debug(event)
 
-  if (event.old_record?.releasedAt != null) {
-    return Logger.info(
-      `Dismissing update to '${event.record!.id}' - was already released.`,
-    )
+  if ((event.old as Patch | null)?.releasedAt != null) {
+    return Logger.info(`Dismissing update to '${event.new.id}' - was already released.`)
   }
 
-  Logger.info(`'${event.record!.id}' was just released!`)
+  Logger.info(`'${event.new.id}' was just released!`)
 
   let remaining = Number.POSITIVE_INFINITY
   do {
-    remaining = await sendNotificationsInBatches(event.record!)
+    remaining = await sendNotificationsInBatches(event.new)
   } while (remaining > 1)
 }
 

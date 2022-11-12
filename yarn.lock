@@ -273,63 +273,63 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@supabase/functions-js@npm:^2.0.0-rc.1":
-  version: 2.0.0-rc.1
-  resolution: "@supabase/functions-js@npm:2.0.0-rc.1"
+"@supabase/functions-js@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "@supabase/functions-js@npm:2.0.0"
   dependencies:
     cross-fetch: ^3.1.5
-  checksum: 56b6fa935b7aa136c615c97c9f73d671966740b309c4efbf53522a0b76b8c04d492456f79952f8fc9e6df41b389fdb4154dde79039d4e2cebf5463d137758458
+  checksum: 023d1bf17a7e58d40822ef09ea0d751a807dc9028ba5f47b93177f2d3c13bcebe1db109dc1c507e4b5d8efdedb8f1b13d2e1bfef34adf1e81126b6d970027cce
   languageName: node
   linkType: hard
 
-"@supabase/gotrue-js@npm:^2.0.0-rc.3":
-  version: 2.0.0-rc.3
-  resolution: "@supabase/gotrue-js@npm:2.0.0-rc.3"
+"@supabase/gotrue-js@npm:^2.3.0":
+  version: 2.3.0
+  resolution: "@supabase/gotrue-js@npm:2.3.0"
   dependencies:
     cross-fetch: ^3.1.5
-  checksum: 2683756294c964ec13f1a72a11253f261025e6631a41084a7ea66a6265fcc96edb2d7202cf3c69b1f0da8a772519cfa100540d8f71f2b82e0c2dddeed8e755f6
+  checksum: 80bcaa3590a9b72f55ca28980e54f80a73f9d2644443323c4e6886f5d495f9a4869cd6ec51fb2c0a7b4ddb9fabea11dc3c978770e2a2d80c8468f6db79c4e05a
   languageName: node
   linkType: hard
 
-"@supabase/postgrest-js@npm:^1.0.0-rc.4":
-  version: 1.0.0-rc.4
-  resolution: "@supabase/postgrest-js@npm:1.0.0-rc.4"
+"@supabase/postgrest-js@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "@supabase/postgrest-js@npm:1.1.0"
   dependencies:
     cross-fetch: ^3.1.5
-  checksum: 39859ee167c04cf100845945ec0deb30725b690695b9c030cf4a5f4416c3e57ab739e2148f0129d6f22379cefcf09de17c1125f6cd399add43841c008abd5982
+  checksum: 5cb0cd696976c29e1b618004df5096c36f13f38bb6eca12107ffcd918cd8f39d10180993404c7b3b268c30c35a56c27cc02f983488996ad59b9a4919b6f40295
   languageName: node
   linkType: hard
 
-"@supabase/realtime-js@npm:^2.0.0-rc.5":
-  version: 2.0.0-rc.5
-  resolution: "@supabase/realtime-js@npm:2.0.0-rc.5"
+"@supabase/realtime-js@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "@supabase/realtime-js@npm:2.1.0"
   dependencies:
     "@types/phoenix": ^1.5.4
     websocket: ^1.0.34
-  checksum: 8b26da51fb6956c1dd2216fe3929f06f0a377102ea79e94be8fcdb57f63786acb437a4ab673638c0d7739ce15db7f7ef99fe229c0f9e823ae91c9d4042f17308
+  checksum: 839ba208a61c8049fd3dc0be6fac1bc6cd5b8985d0ae412598dfc350f705c40066d0446381a92081a7dc1da4900d9dfa78e97e034a501da4019ae587a56549af
   languageName: node
   linkType: hard
 
-"@supabase/storage-js@npm:^2.0.0-rc.1":
-  version: 2.0.0-rc.1
-  resolution: "@supabase/storage-js@npm:2.0.0-rc.1"
+"@supabase/storage-js@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "@supabase/storage-js@npm:2.0.0"
   dependencies:
     cross-fetch: ^3.1.5
-  checksum: 8caf9c2059ff232e805ebc2f4f551e7e7313e86b927d95c90c9cca2a0010f0397c35c11ab426067fe721cc171886f218817aefc525a76a7bd071735e4f637c17
+  checksum: e1610e0304ee071dfe67490a145b3097377978b38c28c0b307642354644fa6804e1118b0e4bcd870b90c56e8aba5c366093f0d538a39a402576102c927b4e176
   languageName: node
   linkType: hard
 
-"@supabase/supabase-js@npm:2.0.0-rc.8":
-  version: 2.0.0-rc.8
-  resolution: "@supabase/supabase-js@npm:2.0.0-rc.8"
+"@supabase/supabase-js@npm:2.1.0":
+  version: 2.1.0
+  resolution: "@supabase/supabase-js@npm:2.1.0"
   dependencies:
-    "@supabase/functions-js": ^2.0.0-rc.1
-    "@supabase/gotrue-js": ^2.0.0-rc.3
-    "@supabase/postgrest-js": ^1.0.0-rc.4
-    "@supabase/realtime-js": ^2.0.0-rc.5
-    "@supabase/storage-js": ^2.0.0-rc.1
+    "@supabase/functions-js": ^2.0.0
+    "@supabase/gotrue-js": ^2.3.0
+    "@supabase/postgrest-js": ^1.1.0
+    "@supabase/realtime-js": ^2.1.0
+    "@supabase/storage-js": ^2.0.0
     cross-fetch: ^3.1.5
-  checksum: eb4c628f9163afdc42f00752f399f2a018c02eb6cf11af9e3c2658e4c9a76dbcb74054743ddd94b4100300863c80853fe7056feb4153d74d2f9a89d0690d7d8f
+  checksum: 4e4e23cb9ba85b6339b3e617525a799c7aeb122a6ed3e39c423d6d75c87d67ef2f74d216d4a2a04e1bc11f4a2962fefbb49a9feed26776cd1c01167d501b2068
   languageName: node
   linkType: hard
 
@@ -2875,7 +2875,7 @@ fsevents@~2.3.2:
   dependencies:
     "@beequeue/eslint-plugin": 0.7.0
     "@sentry/node": 7.19.0
-    "@supabase/supabase-js": 2.0.0-rc.8
+    "@supabase/supabase-js": 2.1.0
     "@tsconfig/node18": 1.0.1
     "@types/node": 18.11.9
     "@types/pg": 8.6.5

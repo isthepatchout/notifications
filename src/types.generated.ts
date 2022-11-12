@@ -6,6 +6,26 @@ export type Json = string | number | boolean | null | { [key: string]: Json } | 
 export interface Database {
   public: {
     Tables: {
+      patches: {
+        Row: {
+          id: string
+          links: string[]
+          releasedAt: string | null
+          number: number
+        }
+        Insert: {
+          id: string
+          links: string[]
+          releasedAt?: string | null
+          number: number
+        }
+        Update: {
+          id?: string
+          links?: string[]
+          releasedAt?: string | null
+          number?: number
+        }
+      }
       subscriptions: {
         Row: {
           endpoint: string
@@ -35,27 +55,15 @@ export interface Database {
           type?: string
         }
       }
-      patches: {
-        Row: {
-          id: string
-          links: string[]
-          releasedAt: string | null
-          number: number
-        }
-        Insert: {
-          id: string
-          links: string[]
-          releasedAt?: string | null
-          number: number
-        }
-        Update: {
-          id?: string
-          links?: string[]
-          releasedAt?: string | null
-          number?: number
-        }
-      }
     }
-    Functions: {}
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      [_ in never]: never
+    }
+    Enums: {
+      [_ in never]: never
+    }
   }
 }
