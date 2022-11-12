@@ -39,12 +39,12 @@
     "web-push": "3.5.0"
   },
   "devDependencies": {
-    "@beequeue/eslint-plugin": "0.7.0",
+    "@beequeue/eslint-plugin": "1.1.0",
     "@tsconfig/node18": "1.0.1",
     "@types/node": "18.11.9",
     "@types/pg": "8.6.5",
     "@types/web-push": "3.3.2",
-    "eslint": "8.22.0",
+    "eslint": "8.27.0",
     "lint-staged": "13.0.3",
     "prettier": "2.7.1",
     "simple-git-hooks": "2.8.1",
