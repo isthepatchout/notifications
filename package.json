@@ -17,6 +17,7 @@
     ]
   },
   "scripts": {
+    "dev": "onchange --initial --kill .env 'src/**' pnpm-lock.yaml -- pnpm --silent start",
     "lint": "eslint src",
     "prepare": "simple-git-hooks",
     "start": "tsx src/index",
@@ -48,6 +49,7 @@
     "@types/web-push": "3.3.2",
     "eslint": "8.32.0",
     "lint-staged": "13.1.0",
+    "onchange": "7.1.0",
     "prettier": "2.8.3",
     "simple-git-hooks": "2.8.1",
     "typescript": "4.9.4"

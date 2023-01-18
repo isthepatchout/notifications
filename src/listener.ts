@@ -48,4 +48,8 @@ export const initListener = () => {
       handler,
     )
     .subscribe()
+
+  setTimeout(() => {
+    console.log(channel.bindings)
+  }, 1500)
 }
