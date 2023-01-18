@@ -8,7 +8,7 @@ import { Patch } from "./types"
 const tableName = "patches" as const
 
 const handler = async (event: RealtimePostgresInsertPayload<Patch>) => {
-  Logger.debug(event)
+  Logger.info(event, "New patch was inserted")
 
   if ((event.old as Patch | null)?.releasedAt != null) {
     return Logger.info(`Dismissing update to '${event.new.id}' - was already released.`)
