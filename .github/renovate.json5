@@ -13,11 +13,6 @@
   baseBranches: ["main"],
   packageRules: [
     {
-      matchUpdateTypes: ["patch", "minor"],
-      matchManagers: ["npm"],
-      automerge: true,
-    },
-    {
       packagePatterns: ["lint", "!lint-staged"],
       groupName: "Linting",
     },
