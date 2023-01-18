@@ -50,6 +50,6 @@ export const initListener = () => {
     .subscribe()
 
   setTimeout(() => {
-    console.log(channel.bindings)
-  }, 1500)
+    Logger.info({ state: channel.state }, "Realtime")
+  }, 2500)
 }
