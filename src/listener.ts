@@ -1,11 +1,14 @@
-import type { RealtimePostgresInsertPayload } from "@supabase/realtime-js"
+import type {
+  RealtimeChannel,
+  RealtimePostgresInsertPayload,
+} from "@supabase/realtime-js"
 
 import { Logger } from "./logger"
 import { sendNotifications } from "./notifications"
 import { getUnnotifiedSubscriptions, supabase } from "./supabase"
 import { Patch } from "./types"
 
-const tableName = "patches" as const
+const table = "patches" as const
 
 const handler = async (event: RealtimePostgresInsertPayload<Patch>) => {
   Logger.info(event, "New patch was inserted")
@@ -32,10 +35,10 @@ const sendNotificationsInBatches = async (patch: Patch): Promise<number> => {
   return count - subscriptions.length
 }
 
-export const initListener = () => {
-  Logger.info(`Listening for INSERT:s on '${tableName}'...`)
+export const initListener = (): RealtimeChannel => {
+  Logger.info(`Listening for INSERT:s on '${table}'...`)
 
-  const channel = supabase.channel(`public:${tableName}`)
+  const channel = supabase.channel(`public:${table}`)
 
   channel
     .on(
@@ -43,7 +46,7 @@ export const initListener = () => {
       {
         event: "INSERT",
         schema: "public",
-        table: "patches",
+        table,
       },
       handler,
     )
@@ -52,4 +55,6 @@ export const initListener = () => {
   setTimeout(() => {
     Logger.info({ state: channel.state }, "Realtime")
   }, 2500)
+
+  return channel
 }
