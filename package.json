@@ -30,6 +30,10 @@
     "@sentry/node": "7.31.1",
     "@supabase/realtime-js": "2.3.1",
     "@supabase/supabase-js": "2.4.0",
+    "@tsconfig/node18": "1.0.1",
+    "@types/node": "18.11.18",
+    "@types/pg": "8.6.6",
+    "@types/web-push": "3.3.2",
     "dotenv": "16.0.3",
     "knex": "2.4.1",
     "mande": "2.0.3",
@@ -39,19 +43,15 @@
     "pino-pretty": "9.1.1",
     "remeda": "1.6.0",
     "tsx": "3.12.2",
+    "typescript": "4.9.4",
     "web-push": "3.5.0"
   },
   "devDependencies": {
     "@beequeue/eslint-plugin": "1.1.2",
-    "@tsconfig/node18": "1.0.1",
-    "@types/node": "18.11.18",
-    "@types/pg": "8.6.6",
-    "@types/web-push": "3.3.2",
     "eslint": "8.32.0",
     "lint-staged": "13.1.0",
     "onchange": "7.1.0",
     "prettier": "2.8.3",
-    "simple-git-hooks": "2.8.1",
-    "typescript": "4.9.4"
+    "simple-git-hooks": "2.8.1"
   }
 }
