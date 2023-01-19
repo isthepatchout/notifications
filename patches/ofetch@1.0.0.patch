@@ -1,0 +1,16 @@
+diff --git a/dist/error-8a55452d.d.ts b/dist/error-8a55452d.d.ts
+index 7f92c72360f01a2db7180a6c54657175961df67a..30e7fd3abb2c2606167bb131db146aec2491df68 100644
+--- a/dist/error-8a55452d.d.ts
++++ b/dist/error-8a55452d.d.ts
+@@ -1,7 +1,7 @@
+-declare type Fetch = typeof globalThis.fetch;
+-declare type RequestInfo = globalThis.RequestInfo;
+-declare type RequestInit = globalThis.RequestInit;
+-declare type Response = globalThis.Response;
++declare type Fetch = typeof import("node-fetch");
++declare type RequestInfo = import("node-fetch").RequestInfo;
++declare type RequestInit = import("node-fetch").RequestInit;
++declare type Response = import("node-fetch").Response;
+ 
+ interface ResponseMap {
+     blob: Blob;

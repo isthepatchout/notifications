@@ -1,4 +1,4 @@
-import { MandeError } from "mande"
+import { FetchError } from "ofetch/node"
 import { isTruthy } from "remeda"
 import { WebPushError } from "web-push"
 
@@ -35,7 +35,7 @@ export const handleWebPushSendErrors = async (errors: WebPushError[]) => {
   }
 }
 
-export const handleDiscordSendErrors = async (errors: MandeError[]) => {
+export const handleDiscordSendErrors = async (errors: FetchError[]) => {
   if (errors.length === 0) return
 
   Logger.debug(errors)
@@ -45,7 +45,7 @@ export const handleDiscordSendErrors = async (errors: MandeError[]) => {
   Logger.info(`${expired.length} Discord subscriptions have expired.`)
 
   await queries.deleteSubscriptions(
-    expired.filter(isTruthy).map((error) => error.response.url as string),
+    expired.filter(isTruthy).map((error) => error.response!.url),
   )
 
   if (rest.length > 0) {
