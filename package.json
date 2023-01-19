@@ -31,12 +31,9 @@
     "@supabase/realtime-js": "2.3.1",
     "@supabase/supabase-js": "2.4.0",
     "@tsconfig/node18": "1.0.1",
-    "@types/node": "18.11.18",
-    "@types/pg": "8.6.6",
-    "@types/web-push": "3.3.2",
     "dotenv": "16.0.3",
     "knex": "2.4.1",
-    "mande": "2.0.3",
+    "ofetch": "1.0.0",
     "p-queue": "6.6.2",
     "pg": "8.8.0",
     "pino": "8.8.0",
@@ -48,10 +45,19 @@
   },
   "devDependencies": {
     "@beequeue/eslint-plugin": "1.1.2",
+    "@types/node": "18.11.18",
+    "@types/node-fetch": "2.6.2",
+    "@types/pg": "8.6.6",
+    "@types/web-push": "3.3.2",
     "eslint": "8.32.0",
     "lint-staged": "13.1.0",
     "onchange": "7.1.0",
     "prettier": "2.8.3",
     "simple-git-hooks": "2.8.1"
+  },
+  "pnpm": {
+    "patchedDependencies": {
+      "ofetch@1.0.0": "patches/ofetch@1.0.0.patch"
+    }
   }
 }
