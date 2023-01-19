@@ -45,7 +45,7 @@ export const handleDiscordSendErrors = async (errors: FetchError[]) => {
   Logger.info(`${expired.length} Discord subscriptions have expired.`)
 
   await queries.deleteSubscriptions(
-    expired.filter(isTruthy).map((error) => error.response!.url as string),
+    expired.filter(isTruthy).map((error) => error.response!.url),
   )
 
   if (rest.length > 0) {
