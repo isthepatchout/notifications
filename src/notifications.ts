@@ -37,7 +37,7 @@ const sendDiscordNotification = async (endpoint: string, patch: PushEventPatch) 
     type: 2,
     style: 5,
     label: link.includes("/patches/")
-      ? "Check them out!"
+      ? "Check out the patch notes!"
       : "Check out the patch announcement!",
     url: link,
   }))
