@@ -54,5 +54,10 @@
     "onchange": "7.1.0",
     "prettier": "2.8.4",
     "simple-git-hooks": "2.8.1"
+  },
+  "pnpm": {
+    "patchedDependencies": {
+      "ofetch@1.0.1": "patches/ofetch@1.0.1.patch"
+    }
   }
 }

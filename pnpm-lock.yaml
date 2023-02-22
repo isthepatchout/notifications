@@ -3,6 +3,11 @@ lockfileVersion: '6.0'
 overrides:
   '@types/node': 18.14.0
 
+patchedDependencies:
+  ofetch@1.0.1:
+    hash: cmijlqhf4gb4yj7uh337q6io4m
+    path: patches/ofetch@1.0.1.patch
+
 dependencies:
   '@sentry/node':
     specifier: 7.38.0
@@ -24,7 +29,7 @@ dependencies:
     version: 2.4.2(pg@8.9.0)
   ofetch:
     specifier: 1.0.1
-    version: 1.0.1
+    version: 1.0.1(patch_hash=cmijlqhf4gb4yj7uh337q6io4m)
   p-queue:
     specifier: 6.6.2
     version: 6.6.2
@@ -2819,13 +2824,14 @@ packages:
       es-abstract: 1.21.1
     dev: true
 
-  /ofetch@1.0.1:
+  /ofetch@1.0.1(patch_hash=cmijlqhf4gb4yj7uh337q6io4m):
     resolution: {integrity: sha512-icBz2JYfEpt+wZz1FRoGcrMigjNKjzvufE26m9+yUiacRQRHwnNlGRPiDnW4op7WX/MR6aniwS8xw8jyVelF2g==}
     dependencies:
       destr: 1.2.2
       node-fetch-native: 1.0.2
       ufo: 1.1.0
     dev: false
+    patched: true
 
   /on-exit-leak-free@2.1.0:
     resolution: {integrity: sha512-VuCaZZAjReZ3vUwgOB8LxAosIurDiAW0s13rI1YwmaP++jvcxP77AWoQvenZebpCA2m8WC1/EosPYPMjnRAp/w==}
