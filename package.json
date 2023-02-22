@@ -24,40 +24,40 @@
     "typecheck": "tsc --noEmit --project tsconfig.json"
   },
   "resolutions": {
-    "@types/node": "18.13.0"
+    "@types/node": "18.14.0"
   },
   "dependencies": {
-    "@sentry/node": "7.36.0",
+    "@sentry/node": "7.38.0",
     "@supabase/realtime-js": "2.6.0",
-    "@supabase/supabase-js": "2.7.1",
+    "@supabase/supabase-js": "2.8.0",
     "@tsconfig/node18": "1.0.1",
     "dotenv": "16.0.3",
     "knex": "2.4.2",
-    "ofetch": "1.0.0",
+    "ofetch": "1.0.1",
     "p-queue": "6.6.2",
     "pg": "8.9.0",
-    "pino": "8.9.0",
-    "pino-pretty": "9.1.1",
-    "remeda": "1.6.1",
+    "pino": "8.10.0",
+    "pino-pretty": "9.3.0",
+    "remeda": "1.6.2",
     "tsx": "3.12.3",
     "typescript": "4.9.5",
     "web-push": "3.5.0"
   },
   "devDependencies": {
     "@beequeue/eslint-plugin": "1.1.2",
-    "@types/node": "18.13.0",
+    "@types/node": "18.14.0",
     "@types/node-fetch": "2.6.2",
     "@types/pg": "8.6.6",
     "@types/web-push": "3.3.2",
-    "eslint": "8.33.0",
-    "lint-staged": "13.1.1",
+    "eslint": "8.34.0",
+    "lint-staged": "13.1.2",
     "onchange": "7.1.0",
     "prettier": "2.8.4",
     "simple-git-hooks": "2.8.1"
   },
   "pnpm": {
     "patchedDependencies": {
-      "ofetch@1.0.0": "patches/ofetch@1.0.0.patch"
+      "ofetch@1.0.1": "patches/ofetch@1.0.1.patch"
     }
   }
 }

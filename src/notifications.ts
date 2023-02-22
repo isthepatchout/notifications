@@ -38,7 +38,7 @@ const sendDiscordNotification = async (endpoint: string, patch: PushEventPatch) 
     style: 5,
     label: link.includes("/patches/")
       ? "Check out the patch notes!"
-      : "Check out the patch website!",
+      : "Check out the patch announcement!",
     url: link,
   }))
 
@@ -47,7 +47,7 @@ const sendDiscordNotification = async (endpoint: string, patch: PushEventPatch) 
       $fetch.raw(endpoint, {
         method: "POST",
         body: {
-          content: `**${patch.id} has been released!**`,
+          content: `**The ${patch.id} patch notes have been released!**`,
           components: [
             {
               type: 1,
