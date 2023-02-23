@@ -25,7 +25,14 @@ export const knex = Knex({
 })
 
 // Perform connection check
-void knex("patches").select("id").first().then(identity)
+void knex("patches")
+  .select("id")
+  .first()
+  .then(() => {
+    Logger.info(
+      `Connected to db @ ${new URL(process.env.SUPABASE_DB_URL as string).host}`,
+    )
+  })
 
 export const queries = {
   updateNotifiedSubscriptions: async (endpoints: string[], patch: Patch) => {
