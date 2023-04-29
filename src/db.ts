@@ -1,5 +1,4 @@
 import Knex from "knex"
-import { identity } from "remeda"
 
 import { Logger } from "./logger"
 import type { Patch, PushSubscription } from "./types"
