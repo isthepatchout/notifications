@@ -1,7 +1,7 @@
-diff --git a/dist/error-04138797.d.ts b/dist/error-04138797.d.ts
-index 5d7efafb8c866892146019ba06096336af07c80c..35650945a81269a01825a680dd6ca1de4aee7ac4 100644
---- a/dist/error-04138797.d.ts
-+++ b/dist/error-04138797.d.ts
+diff --git a/dist/error-d5becc6e.d.ts b/dist/error-d5becc6e.d.ts
+index 1629b23b4d2b375d02b6d6ebda2e722eb4d934c2..cab259b401bfd6a7d747bd66f143c572d12fdd60 100644
+--- a/dist/error-d5becc6e.d.ts
++++ b/dist/error-d5becc6e.d.ts
 @@ -1,7 +1,7 @@
 -type Fetch = typeof globalThis.fetch;
 -type RequestInfo = globalThis.RequestInfo;
