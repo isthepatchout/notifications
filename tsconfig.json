@@ -6,17 +6,19 @@
     "sourceMap": true,
 
     // Modules
+    "module": "es2022",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "noPropertyAccessFromIndexSignature": false,
     "exactOptionalPropertyTypes": false,
     "baseUrl": "./src",
     "paths": {
-      "~/*": ["src/*"]
+      "~/*": ["src/*"],
     },
 
     // Typechecking
     "noImplicitThis": true,
-    "types": ["node"]
+    "types": ["node"],
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts"],
 }

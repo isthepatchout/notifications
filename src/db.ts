@@ -16,7 +16,7 @@ declare module "knex/types/tables" {
 
 export const knex = Knex({
   client: "pg",
-  connection: process.env.SUPABASE_DB_URL as string,
+  connection: process.env.SUPABASE_DB_URL!,
   pool: {
     min: 0,
     max: 10,
@@ -28,9 +28,7 @@ void knex("patches")
   .select("id")
   .first()
   .then(() => {
-    Logger.info(
-      `Connected to db @ ${new URL(process.env.SUPABASE_DB_URL as string).host}`,
-    )
+    Logger.info(`Connected to db @ ${new URL(process.env.SUPABASE_DB_URL!).host}`)
   })
 
 export const queries = {
@@ -60,7 +58,7 @@ export const queries = {
     Logger.debug({ patch: patch.id }, "Getting unnotified subscriptions...")
 
     const base = knex("subscriptions")
-      .where("environment", process.env.NODE_ENV as string)
+      .where("environment", process.env.NODE_ENV!)
       .andWhere("lastNotified", "<", patch.number)
 
     const { data: rows, error: rowsError } = await base

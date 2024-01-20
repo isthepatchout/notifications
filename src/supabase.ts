@@ -9,8 +9,8 @@ import { Logger } from "./logger"
 import { Database, Patch } from "./types"
 
 export const supabase = new SupabaseClient<Database>(
-  process.env.SUPABASE_URL as string,
-  process.env.SUPABASE_SERVICE_KEY as string,
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_KEY!,
 )
 
 export const handleSentNotifications = async (endpoints: string[], patch: Patch) => {

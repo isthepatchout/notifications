@@ -13,11 +13,11 @@ import {
 } from "./supabase"
 import type { Patch, PushEventPatch, PushSubscription } from "./types"
 
-WebPush.setGCMAPIKey(process.env.GCM_API_KEY as string)
+WebPush.setGCMAPIKey(process.env.GCM_API_KEY!)
 WebPush.setVapidDetails(
   "mailto:adam@haglund.dev",
-  process.env.VAPID_PUBLIC_KEY as string,
-  process.env.VAPID_PRIVATE_KEY as string,
+  process.env.VAPID_PUBLIC_KEY!,
+  process.env.VAPID_PRIVATE_KEY!,
 )
 
 const webPushLimiter = new PQueue({
@@ -94,7 +94,7 @@ export const sendNotifications = async (
 
     promises.push(
       type === "push"
-        ? sendWebPushNotification(endpoint, auth, extra as string, patchData)
+        ? sendWebPushNotification(endpoint, auth, extra!, patchData)
         : sendDiscordNotification(endpoint, patchData),
     )
   }
