@@ -3,10 +3,10 @@ import type {
   RealtimePostgresInsertPayload,
 } from "@supabase/realtime-js"
 
-import { Logger } from "./logger"
-import { sendNotifications } from "./notifications"
-import { getUnnotifiedSubscriptions, supabase } from "./supabase"
-import { Patch } from "./types"
+import { Logger } from "./logger.js"
+import { sendNotifications } from "./notifications.js"
+import { getUnnotifiedSubscriptions, supabase } from "./supabase.js"
+import { Patch } from "./types.js"
 
 const table = "patches" as const
 
@@ -28,11 +28,14 @@ const handler = async (event: RealtimePostgresInsertPayload<Patch>) => {
 const sendNotificationsInBatches = async (patch: Patch): Promise<number> => {
   const { count, subscriptions } = await getUnnotifiedSubscriptions(patch)
 
-  Logger.debug(`Found ${subscriptions.length} notifications to send.`)
+  Logger.debug(`Found ${subscriptions?.length ?? 0} notifications to send.`)
+  if (subscriptions == null) {
+    return 0
+  }
 
   await sendNotifications(subscriptions, patch)
 
-  return count - subscriptions.length
+  return count! - subscriptions.length
 }
 
 export const initListener = (): RealtimeChannel => {

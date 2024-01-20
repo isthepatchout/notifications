@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import type { Database } from "./types.generated"
+import type { Database } from "./types.generated.js"
 
 export type { Database }
 

@@ -1,17 +1,16 @@
 import { $fetch, FetchError } from "ofetch/node"
 import PQueue from "p-queue"
-import * as WebPush from "web-push"
-import { WebPushError } from "web-push"
+import WebPush, { WebPushError } from "web-push"
 
 import { captureException } from "@sentry/node"
 
-import { Logger } from "./logger"
+import { Logger } from "./logger.js"
 import {
   handleDiscordSendErrors,
   handleSentNotifications,
   handleWebPushSendErrors,
-} from "./supabase"
-import type { Patch, PushEventPatch, PushSubscription } from "./types"
+} from "./supabase.js"
+import type { Patch, PushEventPatch, PushSubscription } from "./types.js"
 
 WebPush.setGCMAPIKey(process.env.GCM_API_KEY!)
 WebPush.setVapidDetails(

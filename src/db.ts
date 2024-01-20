@@ -1,20 +1,9 @@
-import Knex from "knex"
+import { knex } from "knex"
 
-import { Logger } from "./logger"
-import type { Patch, PushSubscription } from "./types"
+import { Logger } from "./logger.js"
+import type { Patch, PushSubscription } from "./types.js"
 
-declare module "knex/types/tables" {
-  /* eslint-disable @typescript-eslint/naming-convention,@typescript-eslint/consistent-type-definitions */
-
-  interface Tables {
-    patches: Patch
-    subscriptions: PushSubscription
-  }
-
-  /* eslint-enable @typescript-eslint/naming-convention */
-}
-
-export const knex = Knex({
+export const db = knex({
   client: "pg",
   connection: process.env.SUPABASE_DB_URL!,
   pool: {
@@ -24,7 +13,7 @@ export const knex = Knex({
 })
 
 // Perform connection check
-void knex("patches")
+void db<Patch>("patches")
   .select("id")
   .first()
   .then(() => {
@@ -38,7 +27,7 @@ export const queries = {
       "Updating notified subscriptions...",
     )
 
-    const result = await knex("subscriptions")
+    const result = await db<PushSubscription>("subscriptions")
       .update({ lastNotified: patch.number }, ["endpoint"])
       .whereIn("endpoint", endpoints)
       .then((updated) => updated)
@@ -51,13 +40,13 @@ export const queries = {
   deleteSubscriptions: (endpoints: string[]) => {
     Logger.debug({ endpoints }, "Deleting subscriptions...")
 
-    return knex("subscriptions").delete().whereIn("endpoint", endpoints)
+    return db<PushSubscription>("subscriptions").delete().whereIn("endpoint", endpoints)
   },
 
   getUnnotifiedSubscriptions: async (patch: Patch) => {
     Logger.debug({ patch: patch.id }, "Getting unnotified subscriptions...")
 
-    const base = knex("subscriptions")
+    const base = db<PushSubscription>("subscriptions")
       .where("environment", process.env.NODE_ENV!)
       .andWhere("lastNotified", "<", patch.number)
 

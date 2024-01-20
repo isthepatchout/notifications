@@ -1,14 +1,14 @@
 import { FetchError } from "ofetch/node"
 import { isTruthy } from "remeda"
-import { WebPushError } from "web-push"
+import WebPush from "web-push"
 
-import { SupabaseClient } from "@supabase/supabase-js"
+import Supa from "@supabase/supabase-js"
 
-import { queries } from "./db"
-import { Logger } from "./logger"
-import { Database, Patch } from "./types"
+import { queries } from "./db.js"
+import { Logger } from "./logger.js"
+import { Database, Patch } from "./types.js"
 
-export const supabase = new SupabaseClient<Database>(
+export const supabase = new Supa.SupabaseClient<Database>(
   process.env.SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_KEY!,
 )
@@ -19,7 +19,7 @@ export const handleSentNotifications = async (endpoints: string[], patch: Patch)
   return await queries.updateNotifiedSubscriptions(endpoints, patch)
 }
 
-export const handleWebPushSendErrors = async (errors: WebPushError[]) => {
+export const handleWebPushSendErrors = async (errors: WebPush.WebPushError[]) => {
   if (errors.length === 0) return
 
   Logger.debug(errors)
@@ -60,5 +60,5 @@ export const getUnnotifiedSubscriptions = async (patch: Patch) => {
     throw new Error(error.message)
   }
 
-  return { subscriptions: data!, count: count! }
+  return { subscriptions: data, count }
 }

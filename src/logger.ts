@@ -1,9 +1,9 @@
-import Pino from "pino"
-import pretty from "pino-pretty"
+import { pino } from "pino"
+import { PinoPretty } from "pino-pretty"
 
 const isDev = process.env.NODE_ENV === "development"
 
-export const Logger = Pino(
+export const Logger = pino(
   {
     level: isDev ? "debug" : "info",
     base: {
@@ -11,7 +11,7 @@ export const Logger = Pino(
     },
   },
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-  pretty({
+  PinoPretty({
     ignore: "source",
   }),
 )
