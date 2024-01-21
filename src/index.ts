@@ -1,8 +1,7 @@
-import "./config"
-import "./sentry"
+import "./config.js"
 
-import { initListener } from "./listener"
-import { Logger } from "./logger"
+import { initListener } from "./listener.js"
+import { Logger } from "./logger.js"
 
 Logger.info("Initializing...")
 

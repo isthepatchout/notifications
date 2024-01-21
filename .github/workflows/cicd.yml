@@ -1,4 +1,4 @@
-name: ci
+name: cicd
 
 on:
   push:
@@ -15,7 +15,7 @@ jobs:
 
       - uses: BeeeQueue/setup-node@corepack
         with:
-          node-version: 20
+          node-version: 21
           corepack: true
 
       - name: find pnpm cache path
@@ -42,7 +42,7 @@ jobs:
 
       - uses: BeeeQueue/setup-node@corepack
         with:
-          node-version: 20
+          node-version: 21
           corepack: true
 
       - name: find pnpm cache path
@@ -60,3 +60,42 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - run: pnpm typecheck
+
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+
+    steps:
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: |
+            ghcr.io/${{ github.repository }}
+          tags: |
+            type=raw,value={{sha}}
+            type=raw,value=latest
+
+      - name: Set up depot
+        uses: depot/setup-action@v1
+
+      - name: Login to GHCR
+        if: github.ref == 'refs/heads/main'
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and maybe Push Docker image
+        uses: depot/build-push-action@v1
+        with:
+          project: hpkn3rj9wb
+          push: ${{ github.ref == 'refs/heads/main' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            GITHUB_SHA=${{ github.sha }}

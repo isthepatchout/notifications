@@ -1,35 +1,34 @@
 import { $fetch, FetchError } from "ofetch/node"
 import PQueue from "p-queue"
-import * as WebPush from "web-push"
-import { WebPushError } from "web-push"
+import WebPush, { WebPushError } from "web-push"
 
-import { captureException } from "@sentry/node"
-
-import { Logger } from "./logger"
+import type { Patch, PushSubscription } from "./db/schema.js"
+import { Logger } from "./logger.js"
 import {
   handleDiscordSendErrors,
   handleSentNotifications,
   handleWebPushSendErrors,
-} from "./supabase"
-import type { Patch, PushEventPatch, PushSubscription } from "./types"
+} from "./supabase.js"
 
-WebPush.setGCMAPIKey(process.env.GCM_API_KEY as string)
+type PushEventPatch = Patch & { type: "patch" }
+
+WebPush.setGCMAPIKey(process.env.GCM_API_KEY!)
 WebPush.setVapidDetails(
   "mailto:adam@haglund.dev",
-  process.env.VAPID_PUBLIC_KEY as string,
-  process.env.VAPID_PRIVATE_KEY as string,
+  process.env.VAPID_PUBLIC_KEY!,
+  process.env.VAPID_PRIVATE_KEY!,
 )
 
 const webPushLimiter = new PQueue({
   timeout: 10_000,
-  concurrency: 33,
+  concurrency: 100,
 })
 
 const discordLimiter = new PQueue({
   timeout: 2000,
-  concurrency: 25,
-  interval: 500,
-  intervalCap: 25,
+  concurrency: 50,
+  interval: 1000,
+  intervalCap: 49,
 })
 
 const sendDiscordNotification = async (endpoint: string, patch: PushEventPatch) => {
@@ -43,19 +42,22 @@ const sendDiscordNotification = async (endpoint: string, patch: PushEventPatch) 
   }))
 
   return discordLimiter
-    .add(() =>
-      $fetch.raw(endpoint, {
-        method: "POST",
-        body: {
-          content: `**The ${patch.id} patch notes have been released!**`,
-          components: [
-            {
-              type: 1,
-              components: buttons,
-            },
-          ],
-        },
-      }),
+    .add(
+      () =>
+        $fetch.raw(endpoint, {
+          responseType: "json",
+          method: "POST",
+          body: {
+            content: `**The ${patch.id} patch notes have been released!**`,
+            components: [
+              {
+                type: 1,
+                components: buttons,
+              },
+            ],
+          },
+        }),
+      { throwOnTimeout: true },
     )
     .then(() => endpoint)
     .catch((error: FetchError | Error) => error)
@@ -68,14 +70,16 @@ const sendWebPushNotification = async (
   patchData: PushEventPatch,
 ) =>
   webPushLimiter
-    .add(() =>
-      WebPush.sendNotification(
-        {
-          endpoint,
-          keys: { auth, p256dh },
-        },
-        JSON.stringify(patchData),
-      ),
+    .add(
+      () =>
+        WebPush.sendNotification(
+          {
+            endpoint,
+            keys: { auth, p256dh },
+          },
+          JSON.stringify(patchData),
+        ),
+      { throwOnTimeout: true },
     )
     .then(() => endpoint)
     .catch((error) => error as WebPushError | Error)
@@ -94,7 +98,7 @@ export const sendNotifications = async (
 
     promises.push(
       type === "push"
-        ? sendWebPushNotification(endpoint, auth, extra as string, patchData)
+        ? sendWebPushNotification(endpoint, auth, extra!, patchData)
         : sendDiscordNotification(endpoint, patchData),
     )
   }
@@ -108,7 +112,7 @@ export const sendNotifications = async (
   const webPushErrors = results.filter(
     (result): result is WebPushError => result instanceof WebPushError,
   )
-  const FetchErrors = results.filter(
+  const fetchErrors = results.filter(
     (result): result is FetchError => (result as FetchError).response != null,
   )
   const successful = results.filter(
@@ -117,27 +121,24 @@ export const sendNotifications = async (
 
   Logger.info(
     `Tried to send ${results.length} notifications. (OK: ${successful.length}, FAIL: ${
-      webPushErrors.length + FetchErrors.length
+      webPushErrors.length + fetchErrors.length
     })`,
   )
 
-  for (const error of errors) {
-    captureException(
-      new Error(`Failed to send notification: ${error.message}`, { cause: error }),
-    )
+  if (errors.length > 0) {
+    Logger.error(errors, "Failed to send some notifications")
   }
 
-  const [updatedEndpoints] = await Promise.all([
+  const successfulHandlingCounts = await Promise.all([
     handleSentNotifications(successful, patch),
     handleWebPushSendErrors(webPushErrors),
-    handleDiscordSendErrors(FetchErrors),
+    handleDiscordSendErrors(fetchErrors),
   ] as const)
 
-  if (updatedEndpoints.length !== subscriptions.length) {
+  const successCount = successfulHandlingCounts.reduce((acc, curr) => acc + curr, 0)
+
+  if (successCount !== subscriptions.length) {
     Logger.error(
-      "A subscription's last notification was not updated as it should've been!! Pulling plug.",
-    )
-    captureException(
       "A subscription's last notification was not updated as it should've been!! Pulling plug.",
     )
     // eslint-disable-next-line n/no-process-exit,unicorn/no-process-exit

@@ -1,22 +1,21 @@
 {
-  "extends": ["@tsconfig/node20/tsconfig.json", "@tsconfig/strictest/tsconfig.json"],
+  "extends": ["@tsconfig/node21/tsconfig.json", "@tsconfig/strictest/tsconfig.json"],
   "compilerOptions": {
     // Output
     "noEmit": true,
     "sourceMap": true,
 
     // Modules
-    "resolveJsonModule": true,
     "noPropertyAccessFromIndexSignature": false,
     "exactOptionalPropertyTypes": false,
     "baseUrl": "./src",
     "paths": {
-      "~/*": ["src/*"]
+      "~/*": ["src/*"],
     },
 
     // Typechecking
     "noImplicitThis": true,
-    "types": ["node"]
+    "types": ["node"],
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts"],
 }

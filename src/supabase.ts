@@ -1,26 +1,34 @@
 import { FetchError } from "ofetch/node"
 import { isTruthy } from "remeda"
-import { WebPushError } from "web-push"
+import { type WebPushError } from "web-push"
 
 import { SupabaseClient } from "@supabase/supabase-js"
 
-import { queries } from "./db"
-import { Logger } from "./logger"
-import { Database, Patch } from "./types"
+import { queries } from "./db/db.js"
+import { type Patch } from "./db/schema.js"
+import { Logger } from "./logger.js"
+import { Database } from "./types.generated.js"
 
 export const supabase = new SupabaseClient<Database>(
-  process.env.SUPABASE_URL as string,
-  process.env.SUPABASE_SERVICE_KEY as string,
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_KEY!,
 )
 
-export const handleSentNotifications = async (endpoints: string[], patch: Patch) => {
-  if (endpoints.length === 0) return []
+export const handleSentNotifications = async (
+  endpoints: string[],
+  patch: Patch,
+): Promise<number> => {
+  if (endpoints.length === 0) return 0
 
-  return await queries.updateNotifiedSubscriptions(endpoints, patch)
+  const result = await queries.updateNotifiedSubscriptions(endpoints, patch)
+
+  return result.length
 }
 
-export const handleWebPushSendErrors = async (errors: WebPushError[]) => {
-  if (errors.length === 0) return
+export const handleWebPushSendErrors = async (
+  errors: WebPushError[],
+): Promise<number> => {
+  if (errors.length === 0) return 0
 
   Logger.debug(errors)
 
@@ -28,15 +36,21 @@ export const handleWebPushSendErrors = async (errors: WebPushError[]) => {
   const rest = errors.filter((error) => error.statusCode !== 410)
   Logger.info(`${expired.length} Web Push subscriptions have expired.`)
 
-  await queries.deleteSubscriptions(expired.map((error) => error.endpoint))
-
   if (rest.length > 0) {
     Logger.error(rest)
   }
+
+  if (expired.length === 0) return 0
+
+  const deletedCount = await queries.deleteSubscriptions(
+    expired.map((error) => error.endpoint),
+  )
+
+  return deletedCount
 }
 
-export const handleDiscordSendErrors = async (errors: FetchError[]) => {
-  if (errors.length === 0) return
+export const handleDiscordSendErrors = async (errors: FetchError[]): Promise<number> => {
+  if (errors.length === 0) return 0
 
   Logger.debug(errors)
 
@@ -44,13 +58,17 @@ export const handleDiscordSendErrors = async (errors: FetchError[]) => {
   const rest = errors.filter((error) => error.response?.status !== 404)
   Logger.info(`${expired.length} Discord subscriptions have expired.`)
 
-  await queries.deleteSubscriptions(
-    expired.filter(isTruthy).map((error) => error.response!.url),
-  )
-
   if (rest.length > 0) {
     Logger.error(rest)
   }
+
+  if (expired.length === 0) return 0
+
+  const deletedCount = await queries.deleteSubscriptions(
+    expired.filter(isTruthy).map((error) => error.response!.url),
+  )
+
+  return deletedCount
 }
 
 export const getUnnotifiedSubscriptions = async (patch: Patch) => {
@@ -60,5 +78,5 @@ export const getUnnotifiedSubscriptions = async (patch: Patch) => {
     throw new Error(error.message)
   }
 
-  return { subscriptions: data!, count: count! }
+  return { subscriptions: data, count }
 }
