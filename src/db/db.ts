@@ -58,6 +58,7 @@ export const queries = {
       .update($subscriptions)
       .set({ lastNotified: patch.number })
       .where(inArray($subscriptions.endpoint, endpoints))
+      .returning({ patch: $subscriptions.lastNotified })
 
     Logger.debug({ count: result.length }, "Updated notified subscriptions...")
 

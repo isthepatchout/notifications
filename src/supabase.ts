@@ -14,10 +14,15 @@ export const supabase = new SupabaseClient<Database>(
   process.env.SUPABASE_SERVICE_KEY!,
 )
 
-export const handleSentNotifications = async (endpoints: string[], patch: Patch) => {
-  if (endpoints.length === 0) return []
+export const handleSentNotifications = async (
+  endpoints: string[],
+  patch: Patch,
+): Promise<number> => {
+  if (endpoints.length === 0) return 0
 
-  return await queries.updateNotifiedSubscriptions(endpoints, patch)
+  const result = await queries.updateNotifiedSubscriptions(endpoints, patch)
+
+  return result.length
 }
 
 export const handleWebPushSendErrors = async (errors: WebPush.WebPushError[]) => {

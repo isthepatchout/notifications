@@ -129,13 +129,13 @@ export const sendNotifications = async (
     Logger.error(errors, "Failed to send some notifications")
   }
 
-  const [updatedEndpoints] = await Promise.all([
+  const [updatedEndpointsCount] = await Promise.all([
     handleSentNotifications(successful, patch),
     handleWebPushSendErrors(webPushErrors),
     handleDiscordSendErrors(fetchErrors),
   ] as const)
 
-  if (updatedEndpoints.length !== subscriptions.length) {
+  if (updatedEndpointsCount !== subscriptions.length) {
     Logger.error(
       "A subscription's last notification was not updated as it should've been!! Pulling plug.",
     )
