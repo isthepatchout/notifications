@@ -17,12 +17,26 @@ const handler = async (event: RealtimePostgresInsertPayload<Patch>) => {
     return Logger.info(`Dismissing update to '${event.new.id}' - was already released.`)
   }
 
-  Logger.info(`'${event.new.id}' was just released!`)
+  Logger.info(
+    {
+      patch: event.new.id,
+    },
+    "A new patch was just released!",
+  )
+
+  const start = Date.now()
 
   let remaining = Number.POSITIVE_INFINITY
   do {
     remaining = await sendNotificationsInBatches(event.new)
   } while (remaining > 0)
+
+  Logger.info(
+    {
+      seconds: Math.round((Date.now() - start) / 1000),
+    },
+    "Finished sending notifications.",
+  )
 }
 
 const sendNotificationsInBatches = async (patch: Patch): Promise<number> => {
