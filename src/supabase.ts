@@ -1,6 +1,6 @@
 import { FetchError } from "ofetch/node"
 import { isTruthy } from "remeda"
-import WebPush from "web-push"
+import { type WebPushError } from "web-push"
 
 import { SupabaseClient } from "@supabase/supabase-js"
 
@@ -26,7 +26,7 @@ export const handleSentNotifications = async (
 }
 
 export const handleWebPushSendErrors = async (
-  errors: WebPush.WebPushError[],
+  errors: WebPushError[],
 ): Promise<number> => {
   if (errors.length === 0) return 0
 
