@@ -17,11 +17,6 @@ void db
     Logger.info(`Connected to db @ ${new URL(process.env.SUPABASE_DB_URL!).host}`)
   })
 
-const deleteSubscriptionsQuery = db
-  .delete($subscriptions)
-  .where(inArray($subscriptions.endpoint, sql.placeholder("endpoints")))
-  .prepare("deleteSubscriptions")
-
 const getUnnotifiedSubscriptionsQuery = db
   .select()
   .from($subscriptions)
@@ -68,7 +63,7 @@ export const queries = {
   deleteSubscriptions: (endpoints: string[]) => {
     Logger.debug({ endpoints }, "Deleting subscriptions...")
 
-    return deleteSubscriptionsQuery.execute({ endpoints })
+    return db.delete($subscriptions).where(inArray($subscriptions.endpoint, endpoints))
   },
 
   getUnnotifiedSubscriptions: async (patch: Patch) => {
