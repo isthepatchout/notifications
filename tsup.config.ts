@@ -2,7 +2,9 @@ import { execSync } from "node:child_process"
 
 import { defineConfig } from "tsup"
 
-const gitSha = execSync("git rev-parse --short HEAD", { encoding: "utf8" }).trim()
+const gitSha =
+  process.env.GITHUB_SHA ||
+  execSync("git rev-parse --short HEAD", { encoding: "utf8" }).trim()
 
 export default defineConfig({
   entry: ["src/index.ts"],
