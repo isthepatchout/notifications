@@ -60,10 +60,15 @@ export const queries = {
     return result
   },
 
-  deleteSubscriptions: (endpoints: string[]) => {
+  deleteSubscriptions: async (endpoints: string[]) => {
     Logger.debug({ endpoints }, "Deleting subscriptions...")
 
-    return db.delete($subscriptions).where(inArray($subscriptions.endpoint, endpoints))
+    const result = await db
+      .delete($subscriptions)
+      .where(inArray($subscriptions.endpoint, endpoints))
+      .returning({ patch: $subscriptions.lastNotified })
+
+    return result.length
   },
 
   getUnnotifiedSubscriptions: async (patch: Patch) => {
