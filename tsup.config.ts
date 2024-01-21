@@ -26,6 +26,8 @@ export default defineConfig({
 
   esbuildOptions: (options) => {
     options.alias = {
+      "readable-stream": "node:stream",
+      "@supabase/node-fetch": "fetch-unfiller/node",
       "node-fetch": "fetch-unfiller/node",
       "node-fetch-native": "fetch-unfiller/node",
       "cross-fetch": "fetch-unfiller/node",
