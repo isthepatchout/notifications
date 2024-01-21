@@ -3,9 +3,8 @@ import { and, count, eq, inArray, lt } from "drizzle-orm/sql"
 import postgres from "postgres"
 
 import { Logger } from "../logger.js"
-import type { Patch } from "../types.js"
 
-import { $patches, $subscriptions } from "./schema.js"
+import { $patches, $subscriptions, type Patch } from "./schema.js"
 
 export const pg = postgres(process.env.SUPABASE_DB_URL!)
 export const db = drizzle(pg)
@@ -71,15 +70,13 @@ export const queries = {
       .catch((error) => error as Error)
 
     if (rows instanceof Error || countResults instanceof Error) {
-      Logger.error(
-        rows instanceof Error ? rows : countResults,
-        "Failed to get unnotified subscriptions.",
-      )
+      const error = (rows instanceof Error ? rows : countResults) as Error
+      Logger.error(error, "Failed to get unnotified subscriptions.")
 
       return {
         data: null,
         count: null,
-        error: rows,
+        error,
       }
     }
 

@@ -3,10 +3,10 @@ import type {
   RealtimePostgresInsertPayload,
 } from "@supabase/realtime-js"
 
+import type { Patch } from "./db/schema.js"
 import { Logger } from "./logger.js"
 import { sendNotifications } from "./notifications.js"
 import { getUnnotifiedSubscriptions, supabase } from "./supabase.js"
-import { Patch } from "./types.js"
 
 const table = "patches" as const
 

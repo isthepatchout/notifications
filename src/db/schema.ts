@@ -14,6 +14,9 @@ export const $patches = pgTable(
   }),
 )
 
+export type Patch = typeof $patches.$inferSelect
+export type PatchInsert = typeof $patches.$inferSelect
+
 export const $subscriptions = pgTable("subscriptions", {
   endpoint: text("endpoint").primaryKey().notNull(),
   type: text("type", { enum: ["push", "discord"] })
@@ -25,3 +28,6 @@ export const $subscriptions = pgTable("subscriptions", {
   lastNotified: integer("lastNotified").notNull().default(0),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 })
+
+export type PushSubscription = typeof $subscriptions.$inferSelect
+export type PushSubscriptionInsert = typeof $subscriptions.$inferSelect

@@ -5,8 +5,9 @@ import WebPush from "web-push"
 import { SupabaseClient } from "@supabase/supabase-js"
 
 import { queries } from "./db/db.js"
+import { type Patch } from "./db/schema.js"
 import { Logger } from "./logger.js"
-import { Database, Patch } from "./types.js"
+import { Database } from "./types.generated.js"
 
 export const supabase = new SupabaseClient<Database>(
   process.env.SUPABASE_URL!,
