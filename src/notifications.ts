@@ -42,19 +42,22 @@ const sendDiscordNotification = async (endpoint: string, patch: PushEventPatch) 
   }))
 
   return discordLimiter
-    .add(() =>
-      $fetch.raw(endpoint, {
-        method: "POST",
-        body: {
-          content: `**The ${patch.id} patch notes have been released!**`,
-          components: [
-            {
-              type: 1,
-              components: buttons,
-            },
-          ],
-        },
-      }),
+    .add(
+      () =>
+        $fetch.raw(endpoint, {
+          responseType: "json",
+          method: "POST",
+          body: {
+            content: `**The ${patch.id} patch notes have been released!**`,
+            components: [
+              {
+                type: 1,
+                components: buttons,
+              },
+            ],
+          },
+        }),
+      { throwOnTimeout: true },
     )
     .then(() => endpoint)
     .catch((error: FetchError | Error) => error)
@@ -67,14 +70,16 @@ const sendWebPushNotification = async (
   patchData: PushEventPatch,
 ) =>
   webPushLimiter
-    .add(() =>
-      WebPush.sendNotification(
-        {
-          endpoint,
-          keys: { auth, p256dh },
-        },
-        JSON.stringify(patchData),
-      ),
+    .add(
+      () =>
+        WebPush.sendNotification(
+          {
+            endpoint,
+            keys: { auth, p256dh },
+          },
+          JSON.stringify(patchData),
+        ),
+      { throwOnTimeout: true },
     )
     .then(() => endpoint)
     .catch((error) => error as WebPushError | Error)
@@ -107,7 +112,7 @@ export const sendNotifications = async (
   const webPushErrors = results.filter(
     (result): result is WebPushError => result instanceof WebPushError,
   )
-  const FetchErrors = results.filter(
+  const fetchErrors = results.filter(
     (result): result is FetchError => (result as FetchError).response != null,
   )
   const successful = results.filter(
@@ -116,18 +121,18 @@ export const sendNotifications = async (
 
   Logger.info(
     `Tried to send ${results.length} notifications. (OK: ${successful.length}, FAIL: ${
-      webPushErrors.length + FetchErrors.length
+      webPushErrors.length + fetchErrors.length
     })`,
   )
 
-  for (const error of errors) {
-    throw new Error(`Failed to send notification: ${error.message}`, { cause: error })
+  if (errors.length > 0) {
+    Logger.error(errors, "Failed to send some notifications")
   }
 
   const [updatedEndpoints] = await Promise.all([
     handleSentNotifications(successful, patch),
     handleWebPushSendErrors(webPushErrors),
-    handleDiscordSendErrors(FetchErrors),
+    handleDiscordSendErrors(fetchErrors),
   ] as const)
 
   if (updatedEndpoints.length !== subscriptions.length) {

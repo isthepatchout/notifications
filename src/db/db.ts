@@ -17,12 +17,6 @@ void db
     Logger.info(`Connected to db @ ${new URL(process.env.SUPABASE_DB_URL!).host}`)
   })
 
-const updateNotifiedSubscriptionsQuery = db
-  .update($subscriptions)
-  .set({ lastNotified: sql.placeholder("lastNotified") })
-  .where(inArray($subscriptions.endpoint, sql.placeholder("endpoints")))
-  .prepare("updateNotifiedSubscriptions")
-
 const deleteSubscriptionsQuery = db
   .delete($subscriptions)
   .where(inArray($subscriptions.endpoint, sql.placeholder("endpoints")))
@@ -60,10 +54,10 @@ export const queries = {
       "Updating notified subscriptions...",
     )
 
-    const result = await updateNotifiedSubscriptionsQuery.execute({
-      placeholder: patch.number,
-      endpoints,
-    })
+    const result = await db
+      .update($subscriptions)
+      .set({ lastNotified: patch.number })
+      .where(inArray($subscriptions.endpoint, endpoints))
 
     Logger.debug({ count: result.length }, "Updated notified subscriptions...")
 
@@ -98,7 +92,10 @@ export const queries = {
       }
     }
 
-    Logger.debug({ cnt: countResults[0]!.cnt, rows }, "Got unnotified subscriptions.")
+    Logger.debug(
+      { cnt: countResults[0]!.cnt, rows: rows.slice(0, 5) },
+      "Got unnotified subscriptions.",
+    )
     return {
       data: rows,
       count: countResults[0]!.cnt,
