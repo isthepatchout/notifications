@@ -7,6 +7,7 @@ const gitSha = execSync("git rev-parse --short HEAD", { encoding: "utf8" }).trim
 export default defineConfig({
   entry: ["src/index.ts"],
   outDir: "dist",
+  external: ["tr46"],
 
   env: {
     // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
@@ -22,7 +23,13 @@ export default defineConfig({
   banner: {
     js: "const require = (await import('node:module')).createRequire(import.meta.url);const __filename = (await import('node:url')).fileURLToPath(import.meta.url);const __dirname = (await import('node:path')).dirname(__filename);",
   },
+
   esbuildOptions: (options) => {
+    options.alias = {
+      "node-fetch": "fetch-unfiller/node",
+      "node-fetch-native": "fetch-unfiller/node",
+      "cross-fetch": "fetch-unfiller/node",
+    }
     options.supported = {
       // For better performance: https://github.com/evanw/esbuild/issues/951
       "object-rest-spread": false,

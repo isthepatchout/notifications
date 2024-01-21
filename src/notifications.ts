@@ -2,8 +2,6 @@ import { $fetch, FetchError } from "ofetch/node"
 import PQueue from "p-queue"
 import WebPush, { WebPushError } from "web-push"
 
-import { captureException } from "@sentry/node"
-
 import { Logger } from "./logger.js"
 import {
   handleDiscordSendErrors,
@@ -121,9 +119,7 @@ export const sendNotifications = async (
   )
 
   for (const error of errors) {
-    captureException(
-      new Error(`Failed to send notification: ${error.message}`, { cause: error }),
-    )
+    throw new Error(`Failed to send notification: ${error.message}`, { cause: error })
   }
 
   const [updatedEndpoints] = await Promise.all([
@@ -134,9 +130,6 @@ export const sendNotifications = async (
 
   if (updatedEndpoints.length !== subscriptions.length) {
     Logger.error(
-      "A subscription's last notification was not updated as it should've been!! Pulling plug.",
-    )
-    captureException(
       "A subscription's last notification was not updated as it should've been!! Pulling plug.",
     )
     // eslint-disable-next-line n/no-process-exit,unicorn/no-process-exit
