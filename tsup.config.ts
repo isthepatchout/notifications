@@ -19,6 +19,9 @@ export default defineConfig({
 
   target: "node21",
   format: ["esm"],
+  banner: {
+    js: "const require = (await import('node:module')).createRequire(import.meta.url);const __filename = (await import('node:url')).fileURLToPath(import.meta.url);const __dirname = (await import('node:path')).dirname(__filename);",
+  },
   esbuildOptions: (options) => {
     options.supported = {
       // For better performance: https://github.com/evanw/esbuild/issues/951

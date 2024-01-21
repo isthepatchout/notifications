@@ -4,7 +4,7 @@ import WebPush from "web-push"
 
 import Supa from "@supabase/supabase-js"
 
-import { queries } from "./db.js"
+import { queries } from "./db/db.js"
 import { Logger } from "./logger.js"
 import { Database, Patch } from "./types.js"
 
