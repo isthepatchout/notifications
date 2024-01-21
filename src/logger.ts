@@ -1,5 +1,5 @@
 import { pino } from "pino"
-import { PinoPretty } from "pino-pretty"
+import { default as PinoPretty } from "pino-pretty"
 
 const isDev = process.env.NODE_ENV === "development"
 
@@ -10,7 +10,7 @@ export const Logger = pino(
       source: "notifications",
     },
   },
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  // @ts-ignore bad types
   PinoPretty({
     ignore: "source",
   }),

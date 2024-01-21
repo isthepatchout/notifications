@@ -35,7 +35,7 @@ const sendNotificationsInBatches = async (patch: Patch): Promise<number> => {
 
   await sendNotifications(subscriptions, patch)
 
-  return count! - subscriptions.length
+  return count - subscriptions.length
 }
 
 export const initListener = (): RealtimeChannel => {

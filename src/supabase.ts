@@ -2,13 +2,13 @@ import { FetchError } from "ofetch/node"
 import { isTruthy } from "remeda"
 import WebPush from "web-push"
 
-import Supa from "@supabase/supabase-js"
+import { SupabaseClient } from "@supabase/supabase-js"
 
 import { queries } from "./db/db.js"
 import { Logger } from "./logger.js"
 import { Database, Patch } from "./types.js"
 
-export const supabase = new Supa.SupabaseClient<Database>(
+export const supabase = new SupabaseClient<Database>(
   process.env.SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_KEY!,
 )
