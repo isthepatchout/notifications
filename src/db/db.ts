@@ -26,7 +26,8 @@ const getUnnotifiedSubscriptionsQuery = db
       lt($subscriptions.lastNotified, sql.placeholder("patchNumber")),
     ),
   )
-  .limit(333)
+  .limit(1000)
+  .orderBy($subscriptions.createdAt)
   .prepare("getUnnotifiedSubscriptions")
 
 const getUnnotifiedSubscriptionsCountQuery = db
@@ -93,10 +94,7 @@ export const queries = {
       }
     }
 
-    Logger.debug(
-      { cnt: countResults[0]!.cnt, rows: rows.slice(0, 5) },
-      "Got unnotified subscriptions.",
-    )
+    Logger.debug({ count: countResults[0]!.cnt }, "Got unnotified subscriptions.")
     return {
       data: rows,
       count: countResults[0]!.cnt,

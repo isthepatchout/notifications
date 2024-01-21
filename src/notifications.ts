@@ -21,14 +21,14 @@ WebPush.setVapidDetails(
 
 const webPushLimiter = new PQueue({
   timeout: 10_000,
-  concurrency: 33,
+  concurrency: 100,
 })
 
 const discordLimiter = new PQueue({
   timeout: 2000,
-  concurrency: 25,
-  interval: 500,
-  intervalCap: 25,
+  concurrency: 50,
+  interval: 1000,
+  intervalCap: 49,
 })
 
 const sendDiscordNotification = async (endpoint: string, patch: PushEventPatch) => {
