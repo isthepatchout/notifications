@@ -29,6 +29,8 @@ export const handleWebPushSendErrors = async (errors: WebPush.WebPushError[]) =>
   const rest = errors.filter((error) => error.statusCode !== 410)
   Logger.info(`${expired.length} Web Push subscriptions have expired.`)
 
+  if (expired.length === 0) return
+
   await queries.deleteSubscriptions(expired.map((error) => error.endpoint))
 
   if (rest.length > 0) {
@@ -44,6 +46,8 @@ export const handleDiscordSendErrors = async (errors: FetchError[]) => {
   const expired = errors.filter((error) => error.response?.status === 404)
   const rest = errors.filter((error) => error.response?.status !== 404)
   Logger.info(`${expired.length} Discord subscriptions have expired.`)
+
+  if (expired.length === 0) return
 
   await queries.deleteSubscriptions(
     expired.filter(isTruthy).map((error) => error.response!.url),
