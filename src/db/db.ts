@@ -1,5 +1,5 @@
 import { drizzle } from "drizzle-orm/postgres-js"
-import { and, count, eq, inArray, lt } from "drizzle-orm/sql"
+import { and, count, eq, inArray, lt, sql } from "drizzle-orm/sql"
 import postgres from "postgres"
 
 import { Logger } from "../logger.js"
@@ -17,6 +17,42 @@ void db
     Logger.info(`Connected to db @ ${new URL(process.env.SUPABASE_DB_URL!).host}`)
   })
 
+const updateNotifiedSubscriptionsQuery = db
+  .update($subscriptions)
+  .set({ lastNotified: sql.placeholder("lastNotified") })
+  .where(inArray($subscriptions.endpoint, sql.placeholder("endpoints")))
+  .prepare("updateNotifiedSubscriptions")
+
+const deleteSubscriptionsQuery = db
+  .delete($subscriptions)
+  .where(inArray($subscriptions.endpoint, sql.placeholder("endpoints")))
+  .prepare("deleteSubscriptions")
+
+const getUnnotifiedSubscriptionsQuery = db
+  .select()
+  .from($subscriptions)
+  .where(
+    and(
+      eq($subscriptions.environment, process.env.NODE_ENV as never),
+      lt($subscriptions.lastNotified, sql.placeholder("patchNumber")),
+    ),
+  )
+  .limit(333)
+  .prepare("getUnnotifiedSubscriptions")
+
+const getUnnotifiedSubscriptionsCountQuery = db
+  .select({
+    cnt: count($subscriptions.endpoint),
+  })
+  .from($subscriptions)
+  .where(
+    and(
+      eq($subscriptions.environment, process.env.NODE_ENV as never),
+      lt($subscriptions.lastNotified, sql.placeholder("patchNumber")),
+    ),
+  )
+  .prepare("getUnnotifiedSubscriptionsCount")
+
 export const queries = {
   updateNotifiedSubscriptions: async (endpoints: string[], patch: Patch) => {
     Logger.debug(
@@ -24,11 +60,10 @@ export const queries = {
       "Updating notified subscriptions...",
     )
 
-    const result = await db
-      .update($subscriptions)
-      .set({ lastNotified: patch.number })
-      .where(inArray($subscriptions.endpoint, endpoints))
-      .then((updated) => updated)
+    const result = await updateNotifiedSubscriptionsQuery.execute({
+      placeholder: patch.number,
+      endpoints,
+    })
 
     Logger.debug({ count: result.length }, "Updated notified subscriptions...")
 
@@ -38,35 +73,18 @@ export const queries = {
   deleteSubscriptions: (endpoints: string[]) => {
     Logger.debug({ endpoints }, "Deleting subscriptions...")
 
-    return db.delete($subscriptions).where(inArray($subscriptions.endpoint, endpoints))
+    return deleteSubscriptionsQuery.execute({ endpoints })
   },
 
   getUnnotifiedSubscriptions: async (patch: Patch) => {
     Logger.debug({ patch: patch.id }, "Getting unnotified subscriptions...")
 
-    const rows = await db
-      .select()
-      .from($subscriptions)
-      .where(
-        and(
-          eq($subscriptions.environment, process.env.NODE_ENV as never),
-          lt($subscriptions.lastNotified, patch.number),
-        ),
-      )
-      .limit(333)
+    const rows = await getUnnotifiedSubscriptionsQuery
+      .execute({ patchNumber: patch.number })
       .catch((error) => error as Error)
 
-    const countResults = await db
-      .select({
-        cnt: count($subscriptions.endpoint),
-      })
-      .from($subscriptions)
-      .where(
-        and(
-          eq($subscriptions.environment, process.env.NODE_ENV as never),
-          lt($subscriptions.lastNotified, patch.number),
-        ),
-      )
+    const countResults = await getUnnotifiedSubscriptionsCountQuery
+      .execute({ patchNumber: patch.number })
       .catch((error) => error as Error)
 
     if (rows instanceof Error || countResults instanceof Error) {
