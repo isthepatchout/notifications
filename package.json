@@ -30,7 +30,7 @@
     "@beequeue/eslint-plugin": "4.0.0",
     "@supabase/realtime-js": "2.9.3",
     "@supabase/supabase-js": "2.39.3",
-    "@tsconfig/node20": "20.1.2",
+    "@tsconfig/node21": "21.0.1",
     "@tsconfig/strictest": "2.0.2",
     "@types/node": "20.11.5",
     "@types/node-fetch": "2.6.11",

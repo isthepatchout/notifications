@@ -29,9 +29,9 @@ devDependencies:
   '@supabase/supabase-js':
     specifier: 2.39.3
     version: 2.39.3
-  '@tsconfig/node20':
-    specifier: 20.1.2
-    version: 20.1.2
+  '@tsconfig/node21':
+    specifier: 21.0.1
+    version: 21.0.1
   '@tsconfig/strictest':
     specifier: 2.0.2
     version: 2.0.2
@@ -776,8 +776,8 @@ packages:
       - utf-8-validate
     dev: true
 
-  /@tsconfig/node20@20.1.2:
-    resolution: {integrity: sha512-madaWq2k+LYMEhmcp0fs+OGaLFk0OenpHa4gmI4VEmCKX4PJntQ6fnnGADVFrVkBj0wIdAlQnK/MrlYTHsa1gQ==}
+  /@tsconfig/node21@21.0.1:
+    resolution: {integrity: sha512-2Khg79N+z2Qkb9SjLzOi8cz2PSa/oUpHIeQm1YWzmWXkoFcPXFZSHgs+Z8iPCDjIoXFqMNYntiTXxfLYQMcRhw==}
     dev: true
 
   /@tsconfig/strictest@2.0.2:
