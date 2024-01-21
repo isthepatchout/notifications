@@ -22,7 +22,7 @@ const handler = async (event: RealtimePostgresInsertPayload<Patch>) => {
   let remaining = Number.POSITIVE_INFINITY
   do {
     remaining = await sendNotificationsInBatches(event.new)
-  } while (remaining > 1)
+  } while (remaining > 0)
 }
 
 const sendNotificationsInBatches = async (patch: Patch): Promise<number> => {
