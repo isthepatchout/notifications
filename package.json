@@ -18,10 +18,12 @@
     ]
   },
   "scripts": {
-    "dev": "onchange --initial --kill .env 'src/**' pnpm-lock.yaml -- pnpm --silent start",
+    "build": "tsup",
+    "dev": "onchange --initial --kill .env 'src/**' pnpm-lock.yaml -- pnpm --silent dev:start",
+    "dev:start": "pnpm --silent build; pnpm --silent start",
     "lint": "eslint src",
     "prepare": "simple-git-hooks",
-    "start": "node --import tsx/esm src/index.ts",
+    "start": "node dist/index.js",
     "typecheck": "tsc --noEmit --project tsconfig.json"
   },
   "devDependencies": {
@@ -50,7 +52,6 @@
     "remeda": "1.37.0",
     "simple-git-hooks": "2.9.0",
     "tsup": "8.0.1",
-    "tsx": "4.7.0",
     "typescript": "5.3.3",
     "web-push": "3.6.7"
   }
