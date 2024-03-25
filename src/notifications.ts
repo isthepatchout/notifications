@@ -25,7 +25,7 @@ const webPushLimiter = new PQueue({
 })
 
 const discordLimiter = new PQueue({
-  timeout: 2000,
+  timeout: 10_000,
   concurrency: 50,
   interval: 1000,
   intervalCap: 49,
