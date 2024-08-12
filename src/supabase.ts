@@ -1,13 +1,13 @@
-import { FetchError } from "ofetch/node"
+import type { FetchError } from "ofetch/node"
 import { isTruthy } from "remeda"
-import { type WebPushError } from "web-push"
+import type { WebPushError } from "web-push"
 
 import { SupabaseClient } from "@supabase/supabase-js"
 
 import { queries } from "./db/db.js"
-import { type Patch } from "./db/schema.js"
+import type { Patch } from "./db/schema.js"
 import { Logger } from "./logger.js"
-import { Database } from "./types.generated.js"
+import type { Database } from "./types.generated.js"
 
 export const supabase = new SupabaseClient<Database>(
   process.env.SUPABASE_URL!,

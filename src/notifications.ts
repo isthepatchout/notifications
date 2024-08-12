@@ -1,4 +1,4 @@
-import { $fetch, FetchError } from "ofetch/node"
+import { $fetch, type FetchError } from "ofetch/node"
 import PQueue from "p-queue"
 import WebPush, { WebPushError } from "web-push"
 
@@ -43,7 +43,7 @@ const sendDiscordNotification = async (endpoint: string, patch: PushEventPatch) 
 
   return discordLimiter
     .add(
-      () =>
+      async () =>
         $fetch.raw(endpoint, {
           responseType: "json",
           method: "POST",
@@ -71,7 +71,7 @@ const sendWebPushNotification = async (
 ) =>
   webPushLimiter
     .add(
-      () =>
+      async () =>
         WebPush.sendNotification(
           {
             endpoint,
@@ -141,7 +141,7 @@ export const sendNotifications = async (
     Logger.error(
       "A subscription's last notification was not updated as it should've been!! Pulling plug.",
     )
-    // eslint-disable-next-line n/no-process-exit,unicorn/no-process-exit
+
     process.exit(1)
   }
 }

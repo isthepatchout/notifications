@@ -8,7 +8,7 @@ import { Logger } from "./logger.js"
 import { sendNotifications } from "./notifications.js"
 import { getUnnotifiedSubscriptions, supabase } from "./supabase.js"
 
-const table = "patches" as const
+const table = "patches"
 
 const handler = async (event: RealtimePostgresInsertPayload<Patch>) => {
   Logger.info(event, "New patch was inserted")
@@ -65,6 +65,7 @@ export const initListener = (): RealtimeChannel => {
         schema: "public",
         table,
       },
+      // eslint-disable-next-line ts/no-misused-promises
       handler,
     )
     .subscribe()

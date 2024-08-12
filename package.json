@@ -27,7 +27,7 @@
     "typecheck": "tsc --noEmit --project tsconfig.json"
   },
   "devDependencies": {
-    "@beequeue/eslint-plugin": "4.0.1",
+    "@antfu/eslint-config": "2.25.1",
     "@supabase/realtime-js": "2.9.3",
     "@supabase/supabase-js": "2.40.0",
     "@tsconfig/node21": "21.0.2",
@@ -38,7 +38,7 @@
     "@types/web-push": "3.6.3",
     "dotenv": "16.4.5",
     "drizzle-orm": "0.30.4",
-    "eslint": "8.57.0",
+    "eslint": "9.9.0",
     "fetch-unfiller": "0.2.0",
     "is-ci": "3.0.1",
     "lint-staged": "15.2.2",
@@ -52,27 +52,13 @@
     "prettier": "3.2.5",
     "remeda": "1.56.0",
     "simple-git-hooks": "2.11.1",
-    "tsup": "8.0.2",
-    "typescript": "5.4.3",
+    "tsup": "8.2.4",
+    "typescript": "5.5.4",
     "web-push": "3.6.7"
   },
   "pnpm": {
     "overrides": {
-      "array-includes": "npm:@nolyfill/array-includes@latest",
-      "array.prototype.findlast": "npm:@nolyfill/array.prototype.findlast@latest",
-      "array.prototype.flat": "npm:@nolyfill/array.prototype.flat@latest",
-      "array.prototype.flatmap": "npm:@nolyfill/array.prototype.flatmap@latest",
-      "array.prototype.toreversed": "npm:@nolyfill/array.prototype.toreversed@latest",
-      "array.prototype.tosorted": "npm:@nolyfill/array.prototype.tosorted@latest",
-      "es-iterator-helpers": "npm:@nolyfill/es-iterator-helpers@latest",
-      "has": "npm:@nolyfill/has@latest",
-      "hasown": "npm:@nolyfill/hasown@latest",
-      "object.assign": "npm:@nolyfill/object.assign@latest",
-      "object.entries": "npm:@nolyfill/object.entries@latest",
-      "object.fromentries": "npm:@nolyfill/object.fromentries@latest",
-      "object.hasown": "npm:@nolyfill/object.hasown@latest",
-      "object.values": "npm:@nolyfill/object.values@latest",
-      "string.prototype.matchall": "npm:@nolyfill/string.prototype.matchall@latest"
+      "is-core-module": "npm:@nolyfill/is-core-module@^1"
     }
   }
 }
