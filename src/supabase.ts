@@ -1,5 +1,4 @@
 import type { FetchError } from "ofetch/node"
-import { isTruthy } from "remeda"
 import type { WebPushError } from "web-push"
 
 import { SupabaseClient } from "@supabase/supabase-js"
@@ -65,7 +64,7 @@ export const handleDiscordSendErrors = async (errors: FetchError[]): Promise<num
   if (expired.length === 0) return 0
 
   const deletedCount = await queries.deleteSubscriptions(
-    expired.filter(isTruthy).map((error) => error.response!.url),
+    expired.filter(Boolean).map((error) => error.response!.url),
   )
 
   return deletedCount
