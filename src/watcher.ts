@@ -1,26 +1,31 @@
+import { setTimeout } from "node:timers/promises"
 import { queries } from "./db/db.js"
 import { Logger } from "./logger.js"
-import { sendNotificationsInBatches } from "./notifications.ts"
+import { sendNotifications } from "./notifications.ts"
 
 export const initWatcher = async () => {
-  let watching = true
-  let latestPatch = await queries.getLatestPatch()
+  while (true) {
+    try {
+      const latestPatch = await queries.getLatestPatch()
+      const {
+        error,
+        data: subs,
+        count,
+      } = await queries.getUnnotifiedSubscriptions(latestPatch)
+      if (error != null) throw error
 
-  Logger.info({ patch: latestPatch }, "Watching for new patches...")
+      if (count === 0) {
+        Logger.info("No unnotified subscriptions found.")
 
-  // eslint-disable-next-line ts/no-misused-promises
-  setInterval(async () => {
-    if (!watching) return
+        await setTimeout(2000)
+        continue
+      }
 
-    const incoming = await queries.getLatestPatch()
-    if (incoming.number <= latestPatch.number) return
-
-    Logger.info({ patch: incoming.id }, "A new patch was found!")
-    latestPatch = incoming
-    watching = false
-
-    await sendNotificationsInBatches(incoming)
-
-    watching = true
-  })
+      Logger.info({ count }, "Unnotified subscriptions found!")
+      await sendNotifications(subs, latestPatch)
+    } catch (error) {
+      Logger.error(error)
+      await setTimeout(10_000)
+    }
+  }
 }
