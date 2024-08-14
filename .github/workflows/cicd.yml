@@ -26,7 +26,7 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
-      - run: bun run lint --format compact
+      - run: bun run lint
 
   typecheck:
     runs-on: ubuntu-latest
