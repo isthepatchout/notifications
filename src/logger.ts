@@ -6,7 +6,7 @@ const isDev = process.env.BUN_ENV === "development"
 
 export const Logger = pino(
   {
-    level: Bun.env.LOG_LEVEL ?? (isDev ? "debug" : "info"),
+    level: process.env.LOG_LEVEL ?? (isDev ? "debug" : "info"),
     base: {
       source: "notifications",
     },

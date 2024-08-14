@@ -85,8 +85,6 @@ export const sendNotifications = async (
       "A subscription's last notification was not updated as it should've been!! Pulling plug.",
     )
 
-    if (Bun.env.BUN_ENV !== "test") {
-      process.exit(1)
-    }
+    process.exit(1)
   }
 }

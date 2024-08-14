@@ -37,8 +37,8 @@ const server = setupServer(...handlers)
 
 beforeAll(() => server.listen())
 beforeEach(async () => {
-  index = 0
   await db.delete($subscriptions)
+  index = 0
 })
 afterEach(() => {
   server.resetHandlers()
@@ -78,14 +78,12 @@ const generateSubs = async (
   )
 
   await db.insert($subscriptions).values(subscriptions).execute()
-
-  return getSubs()
 }
 
 it("should send notifications", async () => {
-  const subs = await generateSubs(5)
+  await generateSubs(5)
 
-  await sendNotifications(subs, patch)
+  await sendNotifications(await getSubs(), patch)
 
   const results = await getSubs()
   expect(results.map((sub) => sub.lastNotified)).toMatchObject([
@@ -98,23 +96,25 @@ it("should send notifications", async () => {
 })
 
 it("should remove expired discord webhooks", async () => {
-  const subs = [await generateSubs(2), await generateSubs(2, "discord", true)].flat()
+  await generateSubs(2)
+  await generateSubs(2, "discord", true)
 
-  await sendNotifications(subs, patch)
+  await sendNotifications(await getSubs(), patch)
 
   const results = await getSubs()
   expect(results).toHaveLength(2)
-  expect(results[0]!.endpoint).toEndWith("0")
-  expect(results[1]!.endpoint).toEndWith("1")
+  expect(results[0]!.endpoint.at(-1)).toBe("0")
+  expect(results[1]!.endpoint.at(-1)).toBe("1")
 })
 
-it("should remove expired discord webhooks", async () => {
-  const subs = [await generateSubs(2, "push"), await generateSubs(2, "push", true)].flat()
+it("should remove expired push webhooks", async () => {
+  await generateSubs(2, "push")
+  await generateSubs(2, "push", true)
 
-  await sendNotifications(subs, patch)
+  await sendNotifications(await getSubs(), patch)
 
   const results = await getSubs()
   expect(results).toHaveLength(2)
-  expect(results[0]!.endpoint).toEndWith("0")
-  expect(results[1]!.endpoint).toEndWith("1")
+  expect(results[0]!.endpoint.at(-1)).toBe("0")
+  expect(results[1]!.endpoint.at(-1)).toBe("1")
 })
