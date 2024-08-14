@@ -9,30 +9,6 @@ import { Web } from "./notifications/web.ts"
 
 type PushEventPatch = Patch & { type: "patch" }
 
-export const sendNotificationsInBatches = async (patch: Patch) => {
-  let remaining = Number.POSITIVE_INFINITY
-
-  do {
-    const {
-      count,
-      data: subscriptions,
-      error,
-    } = await queries.getUnnotifiedSubscriptions(patch)
-    if (error) {
-      throw error
-    }
-
-    Logger.debug(`Found ${subscriptions?.length ?? 0} notifications to send.`)
-    if (subscriptions == null || subscriptions?.length === 0) {
-      break
-    }
-
-    await sendNotifications(subscriptions, patch)
-
-    remaining = count - subscriptions.length
-  } while (remaining > 0)
-}
-
 const handleSentNotifications = async (
   endpoints: string[],
   patch: Patch,

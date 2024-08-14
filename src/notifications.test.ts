@@ -5,7 +5,7 @@ import { HttpResponse, http } from "msw"
 import { setupServer } from "msw/node"
 import { $subscriptions, type Patch, type PushSubscription } from "./db/schema.ts"
 import { db, pg } from "./db/db.ts"
-import { sendNotificationsInBatches } from "./notifications.ts"
+import { sendNotifications } from "./notifications.ts"
 
 const generateP256dh = async () => {
   const keyPair = await crypto.subtle.generateKey(
@@ -82,12 +82,12 @@ const generateSubs = async (
 }
 
 it("should send notifications", async () => {
-  await generateSubs(5)
+  const subs = await generateSubs(5)
 
-  await sendNotificationsInBatches(patch)
+  await sendNotifications(subs, patch)
 
-  const subs = await getSubs()
-  expect(subs.map((sub) => sub.lastNotified)).toMatchObject([
+  const results = await getSubs()
+  expect(results.map((sub) => sub.lastNotified)).toMatchObject([
     patch.number,
     patch.number,
     patch.number,
@@ -97,25 +97,23 @@ it("should send notifications", async () => {
 })
 
 it("should remove expired discord webhooks", async () => {
-  await generateSubs(2)
-  await generateSubs(2, "discord", true)
+  const subs = [await generateSubs(2), await generateSubs(2, "discord", true)].flat()
 
-  await sendNotificationsInBatches(patch)
+  await sendNotifications(subs, patch)
 
-  const subs = await getSubs()
-  expect(subs).toHaveLength(2)
-  expect(subs[0]!.endpoint).toEndWith("0")
-  expect(subs[1]!.endpoint).toEndWith("1")
+  const results = await getSubs()
+  expect(results).toHaveLength(2)
+  expect(results[0]!.endpoint).toEndWith("0")
+  expect(results[1]!.endpoint).toEndWith("1")
 })
 
 it("should remove expired discord webhooks", async () => {
-  await generateSubs(2, "push")
-  await generateSubs(2, "push", true)
+  const subs = [await generateSubs(2, "push"), await generateSubs(2, "push", true)].flat()
 
-  await sendNotificationsInBatches(patch)
+  await sendNotifications(subs, patch)
 
-  const subs = await getSubs()
-  expect(subs).toHaveLength(2)
-  expect(subs[0]!.endpoint).toEndWith("0")
-  expect(subs[1]!.endpoint).toEndWith("1")
+  const results = await getSubs()
+  expect(results).toHaveLength(2)
+  expect(results[0]!.endpoint).toEndWith("0")
+  expect(results[1]!.endpoint).toEndWith("1")
 })
