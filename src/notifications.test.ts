@@ -1,3 +1,4 @@
+import { Buffer } from "node:buffer"
 import { randomBytes } from "node:crypto"
 import { afterAll, afterEach, beforeAll, beforeEach, expect, it } from "bun:test"
 import { DotaVersion } from "dotaver"
