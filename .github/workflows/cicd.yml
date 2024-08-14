@@ -11,55 +11,43 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - uses: BeeeQueue/setup-node@corepack
+      - name: Install bun
+        uses: oven-sh/setup-bun@v2
+
+      - uses: actions/cache@v4
         with:
-          node-version: 21
-          corepack: true
-
-      - name: find pnpm cache path
-        id: cache
-        run: echo "path=$(pnpm store path)" >> $GITHUB_OUTPUT
-
-      - uses: actions/cache@v3
-        with:
-          path: ${{ steps.cache.outputs.path }}
-          key: v1-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          path: ~/.bun/install/cache
+          key: v1-bun-${{ hashFiles('bun.lockb') }}
           restore-keys: |
-            v1-pnpm-
+            v1-bun-
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: bun install --frozen-lockfile
 
-      - run: pnpm lint --format compact
+      - run: bun run lint --format compact
 
   typecheck:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - uses: BeeeQueue/setup-node@corepack
+      - name: Install bun
+        uses: oven-sh/setup-bun@v2
+
+      - uses: actions/cache@v4
         with:
-          node-version: 21
-          corepack: true
-
-      - name: find pnpm cache path
-        id: cache
-        run: echo "path=$(pnpm store path)" >> $GITHUB_OUTPUT
-
-      - uses: actions/cache@v3
-        with:
-          path: ${{ steps.cache.outputs.path }}
-          key: v1-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          path: ~/.bun/install/cache
+          key: v1-bun-${{ hashFiles('bun.lockb') }}
           restore-keys: |
-            v1-pnpm-
+            v1-bun-
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: bun install --frozen-lockfile
 
-      - run: pnpm typecheck
+      - run: bun run typecheck
 
   build:
     runs-on: ubuntu-latest
