@@ -1,8 +1,8 @@
-import "./config.js"
+import "./config.ts"
 
-import { initListener } from "./listener.js"
 import { Logger } from "./logger.js"
+import { initWatcher } from "./watcher.ts"
 
 Logger.info("Initializing...")
 
-void initListener()
+await initWatcher()

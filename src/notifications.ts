@@ -1,94 +1,54 @@
-import { $fetch, type FetchError } from "ofetch/node"
-import PQueue from "p-queue"
-import WebPush, { WebPushError } from "web-push"
+import type { WebPushError } from "web-push"
+import type { XiorError } from "xior"
 
 import type { Patch, PushSubscription } from "./db/schema.js"
 import { Logger } from "./logger.js"
-import {
-  handleDiscordSendErrors,
-  handleSentNotifications,
-  handleWebPushSendErrors,
-} from "./supabase.js"
+import { queries } from "./db/db.ts"
+import { Discord } from "./notifications/discord.ts"
+import { Web } from "./notifications/web.ts"
 
 type PushEventPatch = Patch & { type: "patch" }
 
-WebPush.setGCMAPIKey(process.env.GCM_API_KEY!)
-WebPush.setVapidDetails(
-  "mailto:adam@haglund.dev",
-  process.env.VAPID_PUBLIC_KEY!,
-  process.env.VAPID_PRIVATE_KEY!,
-)
+export const sendNotificationsInBatches = async (patch: Patch) => {
+  let remaining = Number.POSITIVE_INFINITY
 
-const webPushLimiter = new PQueue({
-  timeout: 10_000,
-  concurrency: 100,
-})
+  do {
+    const {
+      count,
+      data: subscriptions,
+      error,
+    } = await queries.getUnnotifiedSubscriptions(patch)
+    if (error) {
+      throw error
+    }
 
-const discordLimiter = new PQueue({
-  timeout: 10_000,
-  concurrency: 50,
-  interval: 1000,
-  intervalCap: 49,
-})
+    Logger.debug(`Found ${subscriptions?.length ?? 0} notifications to send.`)
+    if (subscriptions == null || subscriptions?.length === 0) {
+      break
+    }
 
-const sendDiscordNotification = async (endpoint: string, patch: PushEventPatch) => {
-  const buttons = patch.links.map((link) => ({
-    type: 2,
-    style: 5,
-    label: link.includes("/patches/")
-      ? "Check out the patch notes!"
-      : "Check out the patch announcement!",
-    url: link,
-  }))
+    await sendNotifications(subscriptions, patch)
 
-  return discordLimiter
-    .add(
-      async () =>
-        $fetch.raw(endpoint, {
-          responseType: "json",
-          method: "POST",
-          body: {
-            content: `**The ${patch.id} patch notes have been released!**`,
-            components: [
-              {
-                type: 1,
-                components: buttons,
-              },
-            ],
-          },
-        }),
-      { throwOnTimeout: true },
-    )
-    .then(() => endpoint)
-    .catch((error: FetchError | Error) => error)
+    remaining = count - subscriptions.length
+  } while (remaining > 0)
 }
 
-const sendWebPushNotification = async (
-  endpoint: string,
-  auth: string,
-  p256dh: string,
-  patchData: PushEventPatch,
-) =>
-  webPushLimiter
-    .add(
-      async () =>
-        WebPush.sendNotification(
-          {
-            endpoint,
-            keys: { auth, p256dh },
-          },
-          JSON.stringify(patchData),
-        ),
-      { throwOnTimeout: true },
-    )
-    .then(() => endpoint)
-    .catch((error) => error as WebPushError | Error)
+const handleSentNotifications = async (
+  endpoints: string[],
+  patch: Patch,
+): Promise<number> => {
+  if (endpoints.length === 0) return 0
+
+  const result = await queries.updateNotifiedSubscriptions(endpoints, patch)
+
+  return result.length
+}
 
 export const sendNotifications = async (
   subscriptions: PushSubscription[],
   patch: Patch,
 ) => {
-  const promises: Array<Promise<string | WebPushError | FetchError | Error>> = []
+  const promises: Array<Promise<string | WebPushError | XiorError | Error>> = []
 
   for (const { type, endpoint, auth, extra } of subscriptions) {
     const patchData: PushEventPatch = {
@@ -98,50 +58,59 @@ export const sendNotifications = async (
 
     promises.push(
       type === "push"
-        ? sendWebPushNotification(endpoint, auth, extra!, patchData)
-        : sendDiscordNotification(endpoint, patchData),
+        ? Web.sendNotification(endpoint, auth, extra!, patchData)
+        : Discord.sendNotification(endpoint, patchData),
     )
   }
 
   const results = await Promise.all(promises)
 
-  const errors = results.filter(
-    (result): result is WebPushError =>
-      result instanceof Error && (result as WebPushError).statusCode == null,
-  )
-  const webPushErrors = results.filter(
-    (result): result is WebPushError => result instanceof WebPushError,
-  )
-  const fetchErrors = results.filter(
-    (result): result is FetchError => (result as FetchError).response != null,
-  )
-  const successful = results.filter(
-    (result): result is string => typeof result === "string",
-  )
+  const errors = [] as Error[]
+  const expiredDiscordWebhooks = [] as XiorError[]
+  const expiredWebPushes = [] as WebPushError[]
+  const successful = [] as string[]
+
+  for (const result of results) {
+    if (typeof result === "string") {
+      successful.push(result)
+    } else if ("endpoint" in result) {
+      expiredWebPushes.push(result)
+    } else if ("response" in result) {
+      expiredDiscordWebhooks.push(result)
+    } else {
+      errors.push(result)
+    }
+  }
 
   Logger.info(
-    `Tried to send ${results.length} notifications. (OK: ${successful.length}, FAIL: ${
-      webPushErrors.length + fetchErrors.length
-    })`,
+    {
+      total: results.length,
+      ok: successful.length,
+      expired: expiredDiscordWebhooks.length + expiredWebPushes.length,
+      errors: errors.length,
+    },
+    "Tried to send notifications.",
   )
 
   if (errors.length > 0) {
-    Logger.error(errors, "Failed to send some notifications")
+    Logger.error(errors[0], "Failed to send some notifications")
   }
 
-  const successfulHandlingCounts = await Promise.all([
+  const handledCounts = await Promise.all([
     handleSentNotifications(successful, patch),
-    handleWebPushSendErrors(webPushErrors),
-    handleDiscordSendErrors(fetchErrors),
+    Web.handleExpired(expiredWebPushes),
+    Discord.handleExpired(expiredDiscordWebhooks),
   ] as const)
 
-  const successCount = successfulHandlingCounts.reduce((acc, curr) => acc + curr, 0)
+  const handledCount = handledCounts.reduce((acc, curr) => acc + curr, 0)
 
-  if (successCount !== subscriptions.length) {
+  if (handledCount !== subscriptions.length) {
     Logger.error(
       "A subscription's last notification was not updated as it should've been!! Pulling plug.",
     )
 
-    process.exit(1)
+    if (Bun.env.BUN_ENV !== "test") {
+      process.exit(1)
+    }
   }
 }
