@@ -9,7 +9,7 @@
     "bun": "^1.1.22"
   },
   "simple-git-hooks": {
-    "pre-commit": "pnpm lint-staged"
+    "pre-commit": "bun lint-staged"
   },
   "lint-staged": {
     "*.{js,ts,vue,html,json}": [
@@ -24,6 +24,9 @@
     "start": "bun dist/index.js",
     "test": "bun test --env",
     "typecheck": "tsc --noEmit --project tsconfig.json"
+  },
+  "resolutions": {
+    "is-core-module": "npm:@nolyfill/is-core-module@^1"
   },
   "devDependencies": {
     "@antfu/eslint-config": "2.25.1",
@@ -50,10 +53,5 @@
     "typescript": "5.5.4",
     "web-push": "3.6.7",
     "xior": "0.5.5"
-  },
-  "pnpm": {
-    "overrides": {
-      "is-core-module": "npm:@nolyfill/is-core-module@^1"
-    }
   }
 }
