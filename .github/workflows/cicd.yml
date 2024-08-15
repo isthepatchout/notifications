@@ -31,6 +31,11 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    env:
+      BUN_ENV: test
+      NODE_ENV: test
+      SUPABASE_DB_URL: postgresql://postgres:postgres@localhost:5432/postgres
+
     services:
       # Label used to access the service container
       postgres:
@@ -65,10 +70,11 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
+      - run: bun drizzle-kit push
+
       - run: bun run test
         env:
           # test-only values - not real
-          SUPABASE_DB_URL: postgresql://postgres:postgres@localhost:5432/postgres
           GCM_API_KEY: testing
           VAPID_PUBLIC_KEY: BG8ZcH_p5zNxqiEMm91gvMJM9dXmjU4HZvXEXTB_WdW7sTYtYZaQmTAe5Fgkr9g2xQaBbImVbbGGtfcNXf5qavo
           VAPID_PRIVATE_KEY: YolBfgji-xWh7PMDaY3EZAkmx-KNCXjXv1lbHbZHlw8
