@@ -1,40 +1,31 @@
-FROM node:21-alpine AS build
-
-RUN corepack enable
+FROM oven/bun:1.1-alpine AS build
 
 WORKDIR /app
 
+COPY bunfig.toml .
 COPY package.json .
-COPY pnpm-lock.yaml .
-COPY .npmrc .
+COPY bun.lockb .
 
-ARG GITHUB_SHA
-ENV GITHUB_SHA=${GITHUB_SHA}
-ENV PNPM_HOME=/pnpm
 ENV CI=1
 # Install dependencies
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+RUN --mount=type=cache,id=bun,target=~/.bun/install/cache bun install --frozen-lockfile
 
 COPY . .
 
-ENV NODE_ENV=production
-RUN pnpm --silent run build
+ENV BUN_ENV=production
+RUN bun run build
 
-FROM node:21-alpine
-
-RUN corepack enable
+FROM oven/bun:1.1-alpine
 
 WORKDIR /app
 
 COPY src src
-COPY .npmrc .
+COPY bunfig.toml .
 COPY package.json .
+COPY bun.lockb .
 
-ARG GITHUB_SHA
-ENV GITHUB_SHA=${GITHUB_SHA}
-ENV PNPM_HOME=/pnpm
 ENV CI=1
-ENV NODE_ENV=production
+ENV BUN_ENV=production
 
 COPY --from=build /app/dist dist
 
@@ -44,8 +35,8 @@ ENV NODE_OPTIONS="--enable-source-maps"
 # Warnings disabled, we know what we're doing and they're annoying
 ENV NODE_NO_WARNINGS=1
 # Use production in case any dependencies use it in any way
-ENV NODE_ENV=production
+ENV BUN_ENV=production
 # Timezone UTC
 ENV TZ=UTC
 
-CMD ["pnpm", "--silent", "start"]
+CMD ["bun", "run", "--smol", "dist/index.js"]

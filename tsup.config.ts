@@ -1,26 +1,21 @@
-import { execSync } from "node:child_process"
-
 import { defineConfig } from "tsup"
-
-const gitSha =
-  process.env.GITHUB_SHA ||
-  execSync("git rev-parse --short HEAD", { encoding: "utf8" }).trim()
 
 export default defineConfig({
   entry: ["src/index.ts"],
   outDir: "dist",
-  external: ["tr46"],
 
   env: {
     // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-    NODE_ENV: process.env.NODE_ENV || "production",
-    DEV: (process.env.NODE_ENV === "development") as unknown as string,
-    PROD: (process.env.NODE_ENV === "production") as unknown as string,
+    BUN_ENV: process.env.BUN_ENV || process.env.NODE_ENV || "production",
+    DEV: ((process.env.BUN_ENV || process.env.NODE_ENV) ===
+      "development") as unknown as string,
+    PROD: ((process.env.BUN_ENV || process.env.NODE_ENV) ===
+      "production") as unknown as string,
     TEST: false as unknown as string,
-    GIT_SHA: JSON.stringify(gitSha),
   },
 
-  target: "node21",
+  platform: "node",
+  target: "node22",
   format: ["esm"],
   banner: {
     js: "const require = (await import('node:module')).createRequire(import.meta.url);const __filename = (await import('node:url')).fileURLToPath(import.meta.url);const __dirname = (await import('node:path')).dirname(__filename);",
@@ -29,10 +24,6 @@ export default defineConfig({
   esbuildOptions: (options) => {
     options.alias = {
       "readable-stream": "node:stream",
-      "@supabase/node-fetch": "fetch-unfiller/node",
-      "node-fetch": "fetch-unfiller/node",
-      "node-fetch-native": "fetch-unfiller/node",
-      "cross-fetch": "fetch-unfiller/node",
     }
     options.supported = {
       // For better performance: https://github.com/evanw/esbuild/issues/951
