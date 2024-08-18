@@ -39,4 +39,4 @@ ENV BUN_ENV=production
 # Timezone UTC
 ENV TZ=UTC
 
-CMD ["bun", "run", "--smol", "dist/index.js"]
+CMD ["bun", "run", "dist/index.js"]
