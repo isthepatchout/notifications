@@ -1,3 +1,4 @@
+import type { Insertable } from "kysely"
 import type { WebPushError } from "web-push"
 import type { XiorError } from "xior"
 
@@ -21,7 +22,7 @@ const handleSentNotifications = async (
 }
 
 export const sendNotifications = async (
-  subscriptions: PushSubscription[],
+  subscriptions: Insertable<PushSubscription>[],
   patch: Patch,
 ) => {
   const promises: Array<Promise<string | WebPushError | XiorError | Error>> = []

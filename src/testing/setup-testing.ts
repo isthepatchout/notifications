@@ -1,8 +1,8 @@
 import { Buffer } from "node:buffer"
 import { randomBytes } from "node:crypto"
 
-import { db, pg } from "../db/db.ts"
-import { $patches, $subscriptions, type PushSubscription } from "../db/schema.ts"
+import { db } from "../db/db.ts"
+import type { PushSubscription } from "../db/schema.ts"
 
 if (!Bun.env.SUPABASE_DB_URL?.includes("localhost")) {
   throw new Error("This script can only be run in a local environment")
@@ -48,7 +48,7 @@ const generateSubs = async (
   )
 }
 
-const deletePromise = Promise.all([db.delete($subscriptions), db.delete($patches)])
+await Promise.all([db.deleteFrom("patches"), db.deleteFrom("subscriptions")])
 
 const subs = [
   await generateSubs(100, "discord"),
@@ -57,16 +57,14 @@ const subs = [
   await generateSubs(100, "push", true),
 ].flat()
 
-await deletePromise
-await db.insert($subscriptions).values(subs)
+await db.insertInto("subscriptions").values(subs).execute()
 
-await db.insert($patches).values([
-  {
+await db
+  .insertInto("patches")
+  .values({
     id: "8.00",
     number: 80000,
     releasedAt: new Date(),
     links: [],
-  },
-])
-
-await pg.end()
+  })
+  .execute()

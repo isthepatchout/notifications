@@ -5,12 +5,14 @@ import { queries } from "../db/db.ts"
 import type { Patch } from "../db/schema.ts"
 import { Logger } from "../logger.ts"
 
-WebPush.setGCMAPIKey(process.env.GCM_API_KEY!)
-WebPush.setVapidDetails(
-  "mailto:adam@haglund.dev",
-  process.env.VAPID_PUBLIC_KEY!,
-  process.env.VAPID_PRIVATE_KEY!,
-)
+if (process.env.BUN_ENV !== "test") {
+  WebPush.setGCMAPIKey(process.env.GCM_API_KEY!)
+  WebPush.setVapidDetails(
+    "mailto:adam@haglund.dev",
+    process.env.VAPID_PUBLIC_KEY!,
+    process.env.VAPID_PRIVATE_KEY!,
+  )
+}
 
 type PushEventPatch = Patch & { type: "patch" }
 

@@ -6,8 +6,8 @@ import { DotaVersion } from "dotaver"
 import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
 
-import { db, pg } from "./db/db.ts"
-import { $subscriptions, type Patch, type PushSubscription } from "./db/schema.ts"
+import { db } from "./db/db.ts"
+import type { Patch, PushSubscription } from "./db/schema.ts"
 import { sendNotifications } from "./notifications.ts"
 
 const generateP256dh = async () => {
@@ -39,7 +39,7 @@ const server = setupServer(...handlers)
 
 beforeAll(() => server.listen())
 beforeEach(async () => {
-  await db.delete($subscriptions)
+  await db.deleteFrom("subscriptions").execute()
   index = 0
 })
 afterEach(() => {
@@ -47,7 +47,6 @@ afterEach(() => {
 })
 afterAll(async () => {
   server.close()
-  await pg.end()
 })
 
 const p256dh = await generateP256dh()
@@ -58,7 +57,7 @@ const patch = {
   links: [],
 } satisfies Patch
 
-const getSubs = async () => db.select().from($subscriptions)
+const getSubs = async () => db.selectFrom("subscriptions").selectAll().execute()
 
 let index = 0
 const generateSubs = async (
@@ -79,7 +78,7 @@ const generateSubs = async (
       }) satisfies Omit<PushSubscription, "createdAt">,
   )
 
-  await db.insert($subscriptions).values(subscriptions).execute()
+  await db.insertInto("subscriptions").values(subscriptions).execute()
 }
 
 it("should send notifications", async () => {

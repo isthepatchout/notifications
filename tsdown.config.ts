@@ -3,6 +3,7 @@ import { defineConfig } from "tsdown"
 export default defineConfig({
   entry: "src/index.ts",
   outDir: "dist",
+  external: ["bun", "bun:*"],
 
   env: {
     BUN_ENV: process.env.BUN_ENV || process.env.NODE_ENV || "production",
@@ -18,9 +19,6 @@ export default defineConfig({
   format: "esm",
   fixedExtension: true,
   hash: false,
-  alias: {
-    "readable-stream": "node:stream",
-  },
 
   minify: true,
   sourcemap: true,

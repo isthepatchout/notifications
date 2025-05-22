@@ -1,24 +1,17 @@
 import { DotaVersion } from "dotaver"
-import { desc } from "drizzle-orm/sql"
 
-import { db, pg } from "../db/db.ts"
-import { $patches } from "../db/schema.ts"
+import { db, getLatestPatchQuery } from "../db/db.ts"
+import type { Patch } from "../db/schema.ts"
 
-const latestPatch = await db
-  .select({ id: $patches.id })
-  .from($patches)
-  .orderBy(desc($patches.number))
-  .limit(1)
+const latestPatch = await getLatestPatchQuery.execute().then((patches) => patches[0]!)
 
-const patch = DotaVersion.parse(latestPatch[0]!.id).increment(0, 1, 0)
+const patch = DotaVersion.parse(latestPatch.id).increment(0, 1, 0)
 
-await db.insert($patches).values([
-  {
-    id: patch.toString(),
-    number: patch.toNumber(),
-    releasedAt: new Date(),
-    links: [],
-  },
-])
+const toInsert = {
+  id: patch.toString(),
+  number: patch.toNumber(),
+  releasedAt: new Date(),
+  links: [],
+} satisfies Patch
 
-await pg.end()
+await db.insertInto("patches").values(toInsert).execute()
