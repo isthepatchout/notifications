@@ -17,7 +17,7 @@
     ]
   },
   "scripts": {
-    "build": "tsup",
+    "build": "tsdown",
     "dev": "bun run --env --watch src/index.ts",
     "lint": "eslint src",
     "prepare": "simple-git-hooks",
@@ -35,7 +35,6 @@
     "@types/bun": "1.2.14",
     "@types/web-push": "3.6.3",
     "dotaver": "1.0.1",
-    "dotenv": "16.4.5",
     "drizzle-kit": "0.24.2",
     "drizzle-orm": "0.33.0",
     "eslint": "9.27.0",
@@ -48,7 +47,7 @@
     "postgres": "3.4.4",
     "prettier": "3.5.3",
     "simple-git-hooks": "2.13.0",
-    "tsup": "8.2.4",
+    "tsdown": "0.12.2",
     "typescript": "5.5.4",
     "web-push": "3.6.7",
     "xior": "0.6.1"
