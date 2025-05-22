@@ -1,8 +1,9 @@
 import PQueue from "p-queue"
 import xior, { type XiorError } from "xior"
+
+import { queries } from "../db/db.ts"
 import type { Patch } from "../db/schema.ts"
 import { Logger } from "../logger.ts"
-import { queries } from "../db/db.ts"
 
 type PushEventPatch = Patch & { type: "patch" }
 

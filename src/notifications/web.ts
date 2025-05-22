@@ -1,8 +1,9 @@
 import PQueue from "p-queue"
 import WebPush, { type WebPushError } from "web-push"
+
+import { queries } from "../db/db.ts"
 import type { Patch } from "../db/schema.ts"
 import { Logger } from "../logger.ts"
-import { queries } from "../db/db.ts"
 
 WebPush.setGCMAPIKey(process.env.GCM_API_KEY!)
 WebPush.setVapidDetails(

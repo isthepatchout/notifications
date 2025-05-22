@@ -9,9 +9,9 @@
     "bun": "^1.2.13"
   },
   "simple-git-hooks": {
-    "pre-commit": "bun lint-staged"
+    "pre-commit": "node_modules/.bin/nano-staged"
   },
-  "lint-staged": {
+  "nano-staged": {
     "*.{js,ts,vue,html,json}": [
       "prettier --write"
     ]
@@ -20,7 +20,7 @@
     "build": "tsup",
     "dev": "bun run --env --watch src/index.ts",
     "lint": "eslint src",
-    "prepare": "is-ci || simple-git-hooks",
+    "prepare": "simple-git-hooks",
     "start": "bun dist/index.js",
     "test": "bun test --env",
     "typecheck": "tsc --noEmit --project tsconfig.json"
@@ -29,26 +29,25 @@
     "is-core-module": "npm:@nolyfill/is-core-module@^1"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "3.0.0",
+    "@antfu/eslint-config": "4.13.2",
     "@tsconfig/bun": "1.0.7",
     "@tsconfig/strictest": "2.0.5",
-    "@types/bun": "1.1.8",
+    "@types/bun": "1.2.14",
     "@types/web-push": "3.6.3",
     "dotaver": "1.0.1",
     "dotenv": "16.4.5",
     "drizzle-kit": "0.24.2",
     "drizzle-orm": "0.33.0",
-    "eslint": "9.9.1",
+    "eslint": "9.27.0",
     "is-ci": "3.0.1",
-    "lint-staged": "15.2.9",
     "msw": "2.4.1",
-    "onchange": "7.1.0",
+    "nano-staged": "0.8.0",
     "p-queue": "8.0.1",
     "pino": "9.3.2",
     "pino-pretty": "11.2.2",
     "postgres": "3.4.4",
-    "prettier": "3.3.3",
-    "simple-git-hooks": "2.11.1",
+    "prettier": "3.5.3",
+    "simple-git-hooks": "2.13.0",
     "tsup": "8.2.4",
     "typescript": "5.5.4",
     "web-push": "3.6.7",

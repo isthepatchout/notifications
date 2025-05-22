@@ -1,11 +1,13 @@
 import { Buffer } from "node:buffer"
 import { randomBytes } from "node:crypto"
+
 import { afterAll, afterEach, beforeAll, beforeEach, expect, it } from "bun:test"
 import { DotaVersion } from "dotaver"
-import { HttpResponse, http } from "msw"
+import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
-import { $subscriptions, type Patch, type PushSubscription } from "./db/schema.ts"
+
 import { db, pg } from "./db/db.ts"
+import { $subscriptions, type Patch, type PushSubscription } from "./db/schema.ts"
 import { sendNotifications } from "./notifications.ts"
 
 const generateP256dh = async () => {

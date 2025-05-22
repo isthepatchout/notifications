@@ -1,5 +1,6 @@
-import { desc } from "drizzle-orm/sql"
 import { DotaVersion } from "dotaver"
+import { desc } from "drizzle-orm/sql"
+
 import { db, pg } from "../db/db.ts"
 import { $patches } from "../db/schema.ts"
 

@@ -1,9 +1,9 @@
 import type { WebPushError } from "web-push"
 import type { XiorError } from "xior"
 
+import { queries } from "./db/db.ts"
 import type { Patch, PushSubscription } from "./db/schema.js"
 import { Logger } from "./logger.js"
-import { queries } from "./db/db.ts"
 import { Discord } from "./notifications/discord.ts"
 import { Web } from "./notifications/web.ts"
 
