@@ -1,12 +1,17 @@
-/* eslint-disable require-yield */
+import type { SQL } from "bun"
 import {
   CompiledQuery,
   type DatabaseConnection,
   type QueryResult,
   type TransactionSettings,
 } from "kysely"
+
 import { BunDialectError } from "./errors.js"
-import type { SQL, SQLQuery } from "bun"
+
+type SqlResult<R> = R[] & {
+  count?: number
+  command?: "SELECT" | "INSERT" | "UPDATE" | "DELETE" | string
+}
 
 export class BunConnection implements DatabaseConnection {
   #reservedConnection: SQL
@@ -29,35 +34,26 @@ export class BunConnection implements DatabaseConnection {
     await this.executeQuery(CompiledQuery.raw("commit"))
   }
 
+  #countCommands = new Set(["INSERT", "UPDATE", "DELETE"])
+
   async executeQuery<R>(compiledQuery: CompiledQuery): Promise<QueryResult<R>> {
-    const result = (await this.#reservedConnection.unsafe(
-      compiledQuery.sql,
-      compiledQuery.parameters.slice(),
-    )) as SQLQuery
+    const sqlQuery = this.#reservedConnection
+      .unsafe(compiledQuery.sql, compiledQuery.parameters.slice())
+      .execute()
 
-    //console.log("result", result);
-    // result [
-    //   {
-    //     num: 1,
-    //     str: "test",
-    //   }, statement: undefined, command: "SELECT", count: 1
-    // ]
+    const rows = (await sqlQuery) as SqlResult<R>
 
-    // @ts-expect-error ??? I truly have no clue what SQLQuery is but this works
-    const rows = Array.from(result.values()) as R[]
+    if (this.#countCommands.has(rows.command!)) {
+      const numAffectedRows = BigInt(rows.count ?? rows.length)
 
-    // @ts-expect-error ??? I truly have no clue what SQLQuery is but this works
-    if (["INSERT", "UPDATE", "DELETE"].includes(result.command)) {
-      const numAffectedRows = BigInt(rows.length)
-
-      return { numAffectedRows, rows }
+      return { numAffectedRows, rows: Array.from(rows) }
     }
 
-    return { rows }
+    return { rows: Array.from(rows) }
   }
 
-  releaseConnection(): void {
-    this.#reservedConnection.close()
+  async releaseConnection(): Promise<void> {
+    await this.#reservedConnection.close()
 
     this.#reservedConnection = null!
   }

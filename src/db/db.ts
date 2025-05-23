@@ -1,9 +1,9 @@
-/* eslint-disable ts/no-unsafe-assignment */
 import { Kysely } from "kysely"
+import { PostgresJSDialect } from "kysely-postgres-js"
+import postgres from "postgres"
 
 import { Logger } from "../logger.ts"
 
-import { BunDialect } from "./bun-driver"
 import type { Patch, PushSubscription } from "./schema.ts"
 
 type Database = {
@@ -12,8 +12,8 @@ type Database = {
 }
 
 export const db = new Kysely<Database>({
-  dialect: new BunDialect({
-    url: process.env.DATABASE_URL!,
+  dialect: new PostgresJSDialect({
+    postgres: postgres(process.env.DATABASE_URL!),
   }),
 })
 
@@ -24,7 +24,7 @@ const checkConnection = async () => {
   Logger.info(`Connected to db @ ${new URL(process.env.DATABASE_URL!).host}`)
 }
 
-void checkConnection()
+await checkConnection()
 
 export const getLatestPatchQuery = db
   .selectFrom("patches")
@@ -45,9 +45,10 @@ const getUnnotifiedSubscriptions = async (patchNumber: number) =>
 const getUnnotifiedSubscriptionsCount = async (patchNumber: number) =>
   db
     .selectFrom("subscriptions")
-    .select(({ fn }) => [fn.count("endpoint").as("cnt")])
+    .select(({ fn }) => [fn.count<number>("endpoint").as("cnt")])
     .where("environment", "=", process.env.BUN_ENV)
     .where("lastNotified", "<", patchNumber)
+    .execute()
 
 export const queries = {
   getLatestPatch: async () => {
@@ -76,7 +77,7 @@ export const queries = {
 
     const result = await db
       .updateTable("subscriptions")
-      .set({ lastNotified: patch.number })
+      .set("lastNotified", patch.number)
       .where("endpoint", "in", endpoints)
       .returning(["endpoint", "lastNotified"])
       .execute()
@@ -108,6 +109,7 @@ export const queries = {
     const countResults = await getUnnotifiedSubscriptionsCount(patch.number).catch(
       (error) => error as Error,
     )
+    Logger.warn({ countResults })
 
     if (rows instanceof Error || countResults instanceof Error) {
       const error = (rows instanceof Error ? rows : countResults) as Error

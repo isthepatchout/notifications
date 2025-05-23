@@ -3,8 +3,7 @@ import { randomBytes } from "node:crypto"
 
 import { afterAll, afterEach, beforeAll, beforeEach, expect, it } from "bun:test"
 import { DotaVersion } from "dotaver"
-import { http, HttpResponse } from "msw"
-import { setupServer } from "msw/node"
+import { FetchMocker, MockServer } from "mentoss"
 
 import { db } from "./db/db.ts"
 import type { Patch, PushSubscription } from "./db/schema.ts"
@@ -25,28 +24,35 @@ const generateP256dh = async () => {
   return Buffer.from(publicKey).toString("base64url")
 }
 
-const handlers = [
-  http.post("https://notif.example.com/:type/success/:id", () => HttpResponse.text("Ok")),
-  http.post("https://notif.example.com/discord/error/:id", () =>
-    HttpResponse.text("Error", { status: 404 }),
-  ),
-  http.post("https://notif.example.com/push/error/:id", () =>
-    HttpResponse.text("Error", { status: 410 }),
-  ),
-]
+const mockServer = new MockServer("https://notif.example.com")
 
-const server = setupServer(...handlers)
+const mockOkResponse = (type: PushSubscription["type"], times: number) => {
+  for (let i = 0; i < times; i++) {
+    mockServer.post({ url: "/:type/success/:id", params: { type } }, 200)
+  }
+}
+const mockErrorResponse = (type: PushSubscription["type"], times: number) => {
+  for (let i = 0; i < times; i++) {
+    mockServer.post(
+      { url: "/:type/error/:id", params: { type } },
+      type === "discord" ? 404 : 410,
+    )
+  }
+}
 
-beforeAll(() => server.listen())
+const mocker = new FetchMocker({ servers: [mockServer] })
+
+beforeAll(() => mocker.mockGlobal())
 beforeEach(async () => {
   await db.deleteFrom("subscriptions").execute()
   index = 0
 })
-afterEach(() => {
-  server.resetHandlers()
+afterEach(async () => {
+  mocker.clearAll()
 })
 afterAll(async () => {
-  server.close()
+  await db.deleteFrom("subscriptions").execute()
+  mocker.unmockGlobal()
 })
 
 const p256dh = await generateP256dh()
@@ -82,12 +88,13 @@ const generateSubs = async (
 }
 
 it("should send notifications", async () => {
+  mockOkResponse("discord", 5)
   await generateSubs(5)
 
   await sendNotifications(await getSubs(), patch)
 
   const results = await getSubs()
-  expect(results.map((sub) => sub.lastNotified)).toMatchObject([
+  expect(results.map((sub) => sub.lastNotified)).toStrictEqual([
     patch.number,
     patch.number,
     patch.number,
@@ -97,6 +104,8 @@ it("should send notifications", async () => {
 })
 
 it("should remove expired discord webhooks", async () => {
+  mockOkResponse("discord", 2)
+  mockErrorResponse("discord", 2)
   await generateSubs(2)
   await generateSubs(2, "discord", true)
 
@@ -109,6 +118,8 @@ it("should remove expired discord webhooks", async () => {
 })
 
 it("should remove expired push webhooks", async () => {
+  mockOkResponse("push", 2)
+  mockErrorResponse("push", 2)
   await generateSubs(2, "push")
   await generateSubs(2, "push", true)
 

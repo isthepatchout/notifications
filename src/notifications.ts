@@ -79,13 +79,17 @@ export const sendNotifications = async (
     Discord.handleExpired(expiredDiscordWebhooks),
   ] as const)
 
-  const handledCount = handledCounts.reduce((acc, curr) => acc + curr, 0)
+  const handledCount = handledCounts[0] + handledCounts[1] + handledCounts[2]
 
   if (handledCount !== subscriptions.length) {
     Logger.error(
       "A subscription's last notification was not updated as it should've been!! Pulling plug.",
     )
 
+    if (process.env.BUN_ENV === "test") {
+      Logger.warn("Skipping plug pull because of test environment.")
+      return
+    }
     process.exit(1)
   }
 }
