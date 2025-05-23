@@ -1,6 +1,6 @@
 import { pino } from "pino"
 
-const isProd = process.env.BUN_ENV === "production"
+const isProd = process.env.NODE_ENV === "production"
 
 export const Logger = pino(
   {
@@ -9,7 +9,7 @@ export const Logger = pino(
       source: "notifications",
     },
   },
-  !import.meta.env.PROD
+  !process.env.PROD
     ? (await import("pino-pretty")).PinoPretty({ ignore: "source" })
     : undefined,
 )

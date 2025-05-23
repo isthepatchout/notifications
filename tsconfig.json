@@ -1,18 +1,22 @@
 {
-  "extends": ["@tsconfig/bun/tsconfig.json", "@tsconfig/strictest/tsconfig.json"],
+  "extends": [
+    "@tsconfig/node24/tsconfig.json",
+    "@tsconfig/node-ts/tsconfig.json",
+    "@tsconfig/strictest/tsconfig.json"
+  ],
   "compilerOptions": {
     // Output
     "noEmit": true,
     "sourceMap": true,
-
     // Modules
+    "module": "esnext",
+    "moduleResolution": "bundler",
     "noPropertyAccessFromIndexSignature": false,
     "exactOptionalPropertyTypes": false,
     "baseUrl": "./src",
     "paths": {
       "~/*": ["src/*"]
     },
-
     // Typechecking
     "noImplicitThis": true,
     "types": ["node"]

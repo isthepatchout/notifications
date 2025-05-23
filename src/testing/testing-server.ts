@@ -1,6 +1,12 @@
-Bun.serve({
-  cert: Bun.file("../../cert.pem"),
-  key: Bun.file("../../key.pem"),
+import { readFileSync } from "node:fs"
+
+import { serve } from "srvx"
+
+serve({
+  tls: {
+    cert: readFileSync("../../cert.pem", "utf8"),
+    key: readFileSync("../../key.pem", "utf8"),
+  },
   port: 3000,
   fetch: (request) => {
     const { pathname } = new URL(request.url)

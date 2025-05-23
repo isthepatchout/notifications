@@ -11,9 +11,10 @@ type Database = {
   subscriptions: PushSubscription
 }
 
+export const pg = postgres(process.env.DATABASE_URL!)
 export const db = new Kysely<Database>({
   dialect: new PostgresJSDialect({
-    postgres: postgres(process.env.DATABASE_URL!),
+    postgres: pg,
   }),
 })
 
@@ -36,7 +37,7 @@ const getUnnotifiedSubscriptions = async (patchNumber: number) =>
   db
     .selectFrom("subscriptions")
     .selectAll()
-    .where("environment", "=", process.env.BUN_ENV)
+    .where("environment", "=", process.env.NODE_ENV)
     .where("lastNotified", "<", patchNumber)
     .orderBy("createdAt")
     .limit(1000)
@@ -46,7 +47,7 @@ const getUnnotifiedSubscriptionsCount = async (patchNumber: number) =>
   db
     .selectFrom("subscriptions")
     .select(({ fn }) => [fn.count<number>("endpoint").as("cnt")])
-    .where("environment", "=", process.env.BUN_ENV)
+    .where("environment", "=", process.env.NODE_ENV)
     .where("lastNotified", "<", patchNumber)
     .execute()
 
@@ -109,7 +110,6 @@ export const queries = {
     const countResults = await getUnnotifiedSubscriptionsCount(patch.number).catch(
       (error) => error as Error,
     )
-    Logger.warn({ countResults })
 
     if (rows instanceof Error || countResults instanceof Error) {
       const error = (rows instanceof Error ? rows : countResults) as Error

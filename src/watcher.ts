@@ -1,7 +1,7 @@
 import { setTimeout } from "node:timers/promises"
 
-import { queries } from "./db/db.js"
-import { Logger } from "./logger.js"
+import { queries } from "./db/db.ts"
+import { Logger } from "./logger.ts"
 import { sendNotifications } from "./notifications.ts"
 
 const watcher = async () => {

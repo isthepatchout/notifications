@@ -1,4 +1,4 @@
-import { Logger } from "./logger.js"
+import { Logger } from "./logger.ts"
 import { initWatcher } from "./watcher.ts"
 
 Logger.info("Initializing...")

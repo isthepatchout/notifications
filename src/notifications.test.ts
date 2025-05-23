@@ -1,12 +1,13 @@
+import assert from "node:assert/strict"
 import { Buffer } from "node:buffer"
 import { randomBytes } from "node:crypto"
+import { after, afterEach, before, beforeEach, it } from "node:test"
 
-import { afterAll, afterEach, beforeAll, beforeEach, expect, it } from "bun:test"
 import { DotaVersion } from "dotaver"
 import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
 
-import { db } from "./db/db.ts"
+import { db, pg } from "./db/db.ts"
 import type { Patch, PushSubscription } from "./db/schema.ts"
 import { sendNotifications } from "./notifications.ts"
 
@@ -36,7 +37,7 @@ const handlers = [
 ]
 const server = setupServer(...handlers)
 
-beforeAll(() => server.listen())
+before(() => server.listen())
 beforeEach(async () => {
   await db.deleteFrom("subscriptions").execute()
   index = 0
@@ -44,9 +45,10 @@ beforeEach(async () => {
 afterEach(async () => {
   server.resetHandlers()
 })
-afterAll(async () => {
+after(async () => {
   await db.deleteFrom("subscriptions").execute()
   server.close()
+  await pg.end()
 })
 
 const p256dh = await generateP256dh()
@@ -87,13 +89,10 @@ it("should send notifications", async () => {
   await sendNotifications(await getSubs(), patch)
 
   const results = await getSubs()
-  expect(results.map((sub) => sub.lastNotified)).toStrictEqual([
-    patch.number,
-    patch.number,
-    patch.number,
-    patch.number,
-    patch.number,
-  ])
+  assert.deepEqual(
+    results.map((sub) => sub.lastNotified),
+    [patch.number, patch.number, patch.number, patch.number, patch.number],
+  )
 })
 
 it("should remove expired discord webhooks", async () => {
@@ -103,9 +102,9 @@ it("should remove expired discord webhooks", async () => {
   await sendNotifications(await getSubs(), patch)
 
   const results = await getSubs()
-  expect(results).toHaveLength(2)
-  expect(results[0]!.endpoint.at(-1)).toBe("0")
-  expect(results[1]!.endpoint.at(-1)).toBe("1")
+  assert.equal(results.length, 2)
+  assert.equal(results[0]!.endpoint.at(-1), "0")
+  assert.equal(results[1]!.endpoint.at(-1), "1")
 })
 
 it("should remove expired push webhooks", async () => {
@@ -115,7 +114,7 @@ it("should remove expired push webhooks", async () => {
   await sendNotifications(await getSubs(), patch)
 
   const results = await getSubs()
-  expect(results).toHaveLength(2)
-  expect(results[0]!.endpoint.at(-1)).toBe("0")
-  expect(results[1]!.endpoint.at(-1)).toBe("1")
+  assert.equal(results.length, 2)
+  assert.equal(results[0]!.endpoint.at(-1), "0")
+  assert.equal(results[1]!.endpoint.at(-1), "1")
 })

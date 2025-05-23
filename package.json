@@ -5,8 +5,9 @@
   "author": "BeeeQueue <adam@haglund.dev>",
   "license": "MIT",
   "private": true,
+  "packageManager": "pnpm@10.11.0",
   "engines": {
-    "bun": "^1.2.13"
+    "node": "^24"
   },
   "simple-git-hooks": {
     "pre-commit": "node_modules/.bin/nano-staged"
@@ -18,27 +19,25 @@
   },
   "scripts": {
     "build": "tsdown",
-    "dev": "bun run --env --watch src/index.ts",
+    "dev": "node --env-file=.env --watch src/index.ts",
     "lint": "eslint src",
     "prepare": "simple-git-hooks",
-    "start": "bun dist/index.js",
-    "test": "bun test --env=.env.test",
+    "start": "node dist/index.js",
+    "test": "NODE_ENV=test node --test --env-file=.env.test src/**/*.test.ts",
     "typecheck": "tsc --noEmit --project tsconfig.json"
-  },
-  "resolutions": {
-    "is-core-module": "npm:@nolyfill/is-core-module@^1"
   },
   "devDependencies": {
     "@antfu/eslint-config": "4.13.2",
-    "@tsconfig/bun": "1.0.7",
+    "@tsconfig/node-ts": "23.6.1",
+    "@tsconfig/node24": "24.0.1",
     "@tsconfig/strictest": "2.0.5",
-    "@types/bun": "1.2.14",
+    "@types/node": "22.15.21",
     "@types/web-push": "3.6.4",
     "dotaver": "1.0.1",
     "eslint": "9.27.0",
     "kysely": "0.28.2",
     "kysely-postgres-js": "2.0.0",
-    "msw": "2.4.3",
+    "msw": "2.8.4",
     "nano-staged": "0.8.0",
     "p-queue": "8.1.0",
     "pino": "9.7.0",
@@ -46,6 +45,7 @@
     "postgres": "3.4.7",
     "prettier": "3.5.3",
     "simple-git-hooks": "2.13.0",
+    "srvx": "0.7.1",
     "tsdown": "0.12.2",
     "typescript": "5.8.3",
     "web-push": "3.6.7",

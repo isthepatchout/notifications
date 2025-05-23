@@ -3,8 +3,8 @@ import type { WebPushError } from "web-push"
 import type { XiorError } from "xior"
 
 import { queries } from "./db/db.ts"
-import type { Patch, PushSubscription } from "./db/schema.js"
-import { Logger } from "./logger.js"
+import type { Patch, PushSubscription } from "./db/schema.ts"
+import { Logger } from "./logger.ts"
 import { Discord } from "./notifications/discord.ts"
 import { Web } from "./notifications/web.ts"
 
@@ -86,7 +86,7 @@ export const sendNotifications = async (
       "A subscription's last notification was not updated as it should've been!! Pulling plug.",
     )
 
-    if (process.env.BUN_ENV === "test") {
+    if (process.env.NODE_ENV === "test") {
       Logger.warn("Skipping plug pull because of test environment.")
       return
     }

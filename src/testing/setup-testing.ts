@@ -4,7 +4,7 @@ import { randomBytes } from "node:crypto"
 import { db } from "../db/db.ts"
 import type { PushSubscription } from "../db/schema.ts"
 
-if (!Bun.env.SUPABASE_DB_URL?.includes("localhost")) {
+if (!process.env.DATABASE_URL?.includes("localhost")) {
   throw new Error("This script can only be run in a local environment")
 }
 

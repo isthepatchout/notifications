@@ -5,7 +5,7 @@ import { queries } from "../db/db.ts"
 import type { Patch } from "../db/schema.ts"
 import { Logger } from "../logger.ts"
 
-if (process.env.BUN_ENV !== "test") {
+if (process.env.NODE_ENV !== "test") {
   WebPush.setGCMAPIKey(process.env.GCM_API_KEY!)
   WebPush.setVapidDetails(
     "mailto:adam@haglund.dev",
