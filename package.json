@@ -22,7 +22,7 @@
     "dev": "node --env-file=.env --watch src/index.ts",
     "lint": "eslint src",
     "prepare": "simple-git-hooks",
-    "start": "node dist/index.js",
+    "start": "node dist/index.mjs",
     "test": "NODE_ENV=test node --test --env-file=.env.test src/**/*.test.ts",
     "typecheck": "tsc --noEmit --project tsconfig.json"
   },

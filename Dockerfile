@@ -40,4 +40,4 @@ ENV NODE_OPTIONS="--enable-source-maps"
 # Warnings disabled, we know what we're doing and they're annoying
 ENV NODE_NO_WARNINGS=1
 
-CMD ["node", "dist/index.mjs"]
+CMD ["node", "--run", "start"]

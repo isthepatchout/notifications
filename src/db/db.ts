@@ -125,7 +125,7 @@ export const queries = {
     Logger.debug({ count: countResults[0]!.cnt }, "Got unnotified subscriptions.")
     return {
       data: rows,
-      count: countResults[0]!.cnt,
+      count: Number(countResults[0]!.cnt),
       error: null,
     }
   },

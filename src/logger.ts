@@ -10,6 +10,6 @@ export const Logger = pino(
     },
   },
   !process.env.PROD
-    ? (await import("pino-pretty")).PinoPretty({ ignore: "source" })
+    ? (await import("pino-pretty")).default({ ignore: "source" })
     : undefined,
 )
