@@ -3,7 +3,6 @@ FROM node:24-alpine AS base
 WORKDIR /app
 
 ENV PNPM_HOME=/pnpm
-ENV CI=1
 # Use production in case any dependencies use it in any way
 ENV NODE_ENV=production
 
