@@ -1,32 +1,12 @@
 import antfu from "@antfu/eslint-config"
 
-const sortImports = {
-  "perfectionist/sort-imports": [
-    "error",
-    {
-      type: "natural",
-      internalPattern: ["^@/", "^~/", "^#[a-zA-Z0-9-]+/"],
-      newlinesBetween: "always",
-      groups: [
-        ["builtin", "builtin-type"],
-        ["external", "external-type"],
-        ["internal", "internal-type"],
-        ["parent", "parent-type"],
-        ["sibling", "sibling-type"],
-        ["index", "index-type"],
-        "object",
-        "unknown",
-      ],
-    },
-  ],
-}
-
 export default antfu({
   ignores: ["**/*.json"],
   markdown: false,
   stylistic: false,
   jsonc: false,
   jsx: false,
+  pnpm: false,
   toml: false,
   test: { overrides: { "test/no-import-node-test": "off" } },
   typescript: {
@@ -47,16 +27,36 @@ export default antfu({
     overrides: {
       "no-console": "off",
       "antfu/no-top-level-await": "off",
-      "import/consistent-type-specifier-style": "off",
+      "import/consistent-type-specifier-style": ["error", "prefer-top-level"],
       "node/prefer-global/process": "off",
       "ts/consistent-type-definitions": "off",
-      "ts/consistent-type-imports": ["error", { fixStyle: "inline-type-imports" }],
+      "ts/consistent-type-imports": [
+        "error",
+        { fixStyle: "inline-type-imports", disallowTypeAnnotations: false },
+      ],
       "ts/no-unsafe-argument": "off",
       "ts/no-unsafe-assignment": "off",
       "ts/no-use-before-define": "off",
+      "unicorn/number-literal-case": "off",
       "unused-imports/no-unused-vars": "off",
 
-      ...sortImports,
+      "perfectionist/sort-imports": [
+        "error",
+        {
+          type: "natural",
+          internalPattern: ["^@/", "^~/", "^#[a-zA-Z0-9-]+/"],
+          newlinesBetween: 1,
+          groups: [
+            "builtin",
+            "external",
+            "internal",
+            "parent",
+            "sibling",
+            "index",
+            "unknown",
+          ],
+        },
+      ],
     },
   },
 })

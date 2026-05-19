@@ -1,6 +1,8 @@
-import { Logger } from "./logger.ts"
+import { initLogger, log } from "evlog"
+
 import { initWatcher } from "./watcher.ts"
 
-Logger.info("Initializing...")
+initLogger()
+log.info("startup", "Initializing...")
 
 await initWatcher()

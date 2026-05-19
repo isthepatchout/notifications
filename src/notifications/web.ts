@@ -1,9 +1,9 @@
+import { log } from "evlog"
 import PQueue from "p-queue"
 import WebPush, { type WebPushError } from "web-push"
 
 import { queries } from "../db/db.ts"
 import type { Patch } from "../db/schema.ts"
-import { Logger } from "../logger.ts"
 
 if (process.env.NODE_ENV !== "test") {
   WebPush.setGCMAPIKey(process.env.GCM_API_KEY!)
@@ -28,16 +28,14 @@ const sendNotification = async (
   patchData: PushEventPatch,
 ) =>
   webPushLimiter
-    .add(
-      async () =>
-        WebPush.sendNotification(
-          {
-            endpoint,
-            keys: { auth, p256dh },
-          },
-          JSON.stringify(patchData),
-        ),
-      { throwOnTimeout: true },
+    .add(async () =>
+      WebPush.sendNotification(
+        {
+          endpoint,
+          keys: { auth, p256dh },
+        },
+        JSON.stringify(patchData),
+      ),
     )
     .then(() => endpoint)
     .catch((error) => error as WebPushError | Error)
@@ -45,14 +43,14 @@ const sendNotification = async (
 const handleExpired = async (errors: WebPushError[]): Promise<number> => {
   if (errors.length === 0) return 0
 
-  Logger.debug(errors)
+  log.debug({ errors })
 
   const expired = errors.filter((error) => error.statusCode === 410)
   const rest = errors.filter((error) => error.statusCode !== 410)
-  Logger.info(`${expired.length} Web Push subscriptions have expired.`)
+  log.info("web", `${expired.length} Web Push subscriptions have expired.`)
 
   if (rest.length > 0) {
-    Logger.error(rest)
+    log.error({ rest })
   }
 
   if (expired.length === 0) return 0

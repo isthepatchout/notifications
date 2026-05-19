@@ -1,8 +1,11 @@
 import { setTimeout } from "node:timers/promises"
 
+import { createLogger } from "evlog"
+
 import { queries } from "./db/db.ts"
-import { Logger } from "./logger.ts"
 import { sendNotifications } from "./notifications.ts"
+
+const log = createLogger()
 
 const watcher = async () => {
   try {
@@ -15,16 +18,16 @@ const watcher = async () => {
     if (error != null) throw error
 
     if (count === 0) {
-      Logger.info("No unnotified subscriptions found.")
+      log.info("No unnotified subscriptions found.")
 
       await setTimeout(2000)
       return
     }
 
-    Logger.info({ count }, "Unnotified subscriptions found!")
+    log.info("Unnotified subscriptions found!", { count })
     await sendNotifications(subs, latestPatch)
   } catch (error) {
-    Logger.error(error)
+    log.error(error as Error)
     await setTimeout(10_000)
   }
 }

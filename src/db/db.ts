@@ -1,8 +1,7 @@
+import { log } from "evlog"
 import { Kysely } from "kysely"
 import { PostgresJSDialect } from "kysely-postgres-js"
 import postgres from "postgres"
-
-import { Logger } from "../logger.ts"
 
 import type { Patch, PushSubscription } from "./schema.ts"
 
@@ -22,7 +21,7 @@ export const db = new Kysely<Database>({
 const checkConnection = async () => {
   await db.selectFrom("patches").limit(1).execute()
 
-  Logger.info(`Connected to db @ ${new URL(process.env.DATABASE_URL!).host}`)
+  log.info("db", `Connected to db @ ${new URL(process.env.DATABASE_URL!).host}`)
 }
 
 await checkConnection()
@@ -53,7 +52,7 @@ const getUnnotifiedSubscriptionsCount = async (patchNumber: number) =>
 
 export const queries = {
   getLatestPatch: async () => {
-    Logger.debug("Getting latest patch...")
+    log.debug("db", "Getting latest patch...")
 
     const rows = await getLatestPatchQuery.execute().catch((error) => error as Error)
 
@@ -66,15 +65,17 @@ export const queries = {
     }
 
     const patch = rows[0]!
-    Logger.debug({ patch: patch.id }, "Got latest patch.")
+    log.debug({ tag: "db", message: "Got latest patch.", patch: patch.id })
     return patch
   },
 
   updateNotifiedSubscriptions: async (endpoints: string[], patch: Patch) => {
-    Logger.debug(
-      { patch: patch.id, endpoints: endpoints.length },
-      "Updating notified subscriptions...",
-    )
+    log.debug({
+      tag: "db",
+      message: "Updating notified subscriptions...",
+      patch: patch.id,
+      endpoints: endpoints.length,
+    })
 
     const result = await db
       .updateTable("subscriptions")
@@ -83,13 +84,17 @@ export const queries = {
       .returning(["endpoint", "lastNotified"])
       .execute()
 
-    Logger.debug({ count: result.length }, "Updated notified subscriptions...")
+    log.debug({
+      tag: "db",
+      message: "Updated notified subscriptions...",
+      count: result.length,
+    })
 
     return result
   },
 
   deleteSubscriptions: async (endpoints: string[]) => {
-    Logger.debug({ endpoints }, "Deleting subscriptions...")
+    log.debug({ tag: "db", message: "Deleting subscriptions...", endpoints })
 
     const result = await db
       .deleteFrom("subscriptions")
@@ -101,7 +106,11 @@ export const queries = {
   },
 
   getUnnotifiedSubscriptions: async (patch: Patch) => {
-    Logger.debug({ patch: patch.id }, "Getting unnotified subscriptions...")
+    log.debug({
+      tag: "db",
+      message: "Getting unnotified subscriptions...",
+      patch: patch.id,
+    })
 
     const rows = await getUnnotifiedSubscriptions(patch.number).catch(
       (error) => error as Error,
@@ -113,7 +122,7 @@ export const queries = {
 
     if (rows instanceof Error || countResults instanceof Error) {
       const error = (rows instanceof Error ? rows : countResults) as Error
-      Logger.error(error, "Failed to get unnotified subscriptions.")
+      log.error({ tag: "db", message: "Failed to get unnotified subscriptions.", error })
 
       return {
         data: null,
@@ -122,7 +131,11 @@ export const queries = {
       }
     }
 
-    Logger.debug({ count: countResults[0]!.cnt }, "Got unnotified subscriptions.")
+    log.debug({
+      tag: "db",
+      message: "Got unnotified subscriptions.",
+      count: countResults[0]!.cnt,
+    })
     return {
       data: rows,
       count: Number(countResults[0]!.cnt),

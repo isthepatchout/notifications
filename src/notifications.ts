@@ -1,10 +1,10 @@
+import { log } from "evlog"
 import type { Insertable } from "kysely"
 import type { WebPushError } from "web-push"
 import type { XiorError } from "xior"
 
 import { queries } from "./db/db.ts"
 import type { Patch, PushSubscription } from "./db/schema.ts"
-import { Logger } from "./logger.ts"
 import { Discord } from "./notifications/discord.ts"
 import { Web } from "./notifications/web.ts"
 
@@ -59,18 +59,15 @@ export const sendNotifications = async (
     }
   }
 
-  Logger.info(
-    {
-      total: results.length,
-      ok: successful.length,
-      expired: expiredDiscordWebhooks.length + expiredWebPushes.length,
-      errors: errors.length,
-    },
-    "Tried to send notifications.",
-  )
+  log.info({
+    total: results.length,
+    ok: successful.length,
+    expired: expiredDiscordWebhooks.length + expiredWebPushes.length,
+    errors: errors.length,
+  })
 
   if (errors.length > 0) {
-    Logger.error(errors[0], "Failed to send some notifications")
+    log.error({ message: "Failed to send some notifications", errors })
   }
 
   const handledCounts = await Promise.all([
@@ -82,12 +79,13 @@ export const sendNotifications = async (
   const handledCount = handledCounts[0] + handledCounts[1] + handledCounts[2]
 
   if (handledCount !== subscriptions.length) {
-    Logger.error(
+    log.error(
+      "notifications",
       "A subscription's last notification was not updated as it should've been!! Pulling plug.",
     )
 
     if (process.env.NODE_ENV === "test") {
-      Logger.warn("Skipping plug pull because of test environment.")
+      log.warn("notifications", "Skipping plug pull because of test environment.")
       return
     }
     process.exit(1)
