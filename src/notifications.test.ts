@@ -4,8 +4,7 @@ import { randomBytes } from "node:crypto"
 import { after, afterEach, before, beforeEach, it } from "node:test"
 
 import { DotaVersion } from "dotaver"
-import { http, HttpResponse } from "msw"
-import { setupServer } from "msw/node"
+import { FetchMocker, MockServer } from "mentoss"
 
 import { db, pg } from "./db/db.ts"
 import type { Patch, PushSubscription } from "./db/schema.ts"
@@ -26,28 +25,24 @@ const generateP256dh = async () => {
   return Buffer.from(publicKey).toString("base64url")
 }
 
-const handlers = [
-  http.post("https://notif.example.com/:type/success/:id", () => HttpResponse.text("Ok")),
-  http.post("https://notif.example.com/discord/error/:id", () =>
-    HttpResponse.text("Error", { status: 404 }),
-  ),
-  http.post("https://notif.example.com/push/error/:id", () =>
-    HttpResponse.text("Error", { status: 410 }),
-  ),
-]
-const server = setupServer(...handlers)
+const server = new MockServer("https://notif.example.com")
+const fetchMocker = new FetchMocker({ servers: [server] })
 
-before(() => server.listen())
+before(() => fetchMocker.mockGlobal())
 beforeEach(async () => {
   await db.deleteFrom("subscriptions").execute()
   index = 0
+
+  server.post("/:type/success/:id", { status: 200, body: "Ok" })
+  server.post("/discord/error/:id", { status: 404, body: "Error" })
+  server.post("/push/error/:id", { status: 410, body: "Error" })
 })
 afterEach(async () => {
-  server.resetHandlers()
+  fetchMocker.clearAll()
 })
 after(async () => {
   await db.deleteFrom("subscriptions").execute()
-  server.close()
+  fetchMocker.unmockGlobal()
   await pg.end()
 })
 

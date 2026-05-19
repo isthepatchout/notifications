@@ -1,5 +1,4 @@
 allowBuilds:
-  msw: false
   simple-git-hooks: false
 
 minimumReleaseAge: 4320
