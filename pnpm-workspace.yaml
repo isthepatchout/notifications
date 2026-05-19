@@ -1,4 +1,11 @@
-packages: []
+allowBuilds:
+  msw: false
+  simple-git-hooks: false
+
+minimumReleaseAge: 4320
+
+dedupePeers: true
+dedupePeerDependents: true
 
 overrides:
   "@antfu/eslint-config>@eslint/markdown": "-"
@@ -11,10 +18,6 @@ overrides:
   "@antfu/eslint-config>toml-eslint-parser": "-"
   "@antfu/eslint-config>vitest": "-"
   eslint-plugin-pnpm>jsonc-eslint-parser: "-"
-  is-core-module: npm:@nolyfill/is-core-module@^1
-  safe-buffer: npm:@nolyfill/safe-buffer@^1
-  safer-buffer: npm:@nolyfill/safer-buffer@^1
-
 
 savePrefix: ""
 shellEmulator: true
