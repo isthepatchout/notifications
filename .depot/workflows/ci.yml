@@ -101,4 +101,5 @@ jobs:
         with:
           project: 520fcf1v75
           context: .
+          save: true
 
