@@ -24,9 +24,6 @@ importers:
       '@antfu/eslint-config':
         specifier: 9.0.0
         version: 9.0.0(@typescript-eslint/rule-tester@8.59.3)(@typescript-eslint/typescript-estree@8.59.3)(@typescript-eslint/utils@8.59.3)(eslint@10.4.0)(typescript@6.0.3)
-      '@tsconfig/node-ts':
-        specifier: 23.6.4
-        version: 23.6.4
       '@tsconfig/node24':
         specifier: 24.0.4
         version: 24.0.4
@@ -423,9 +420,6 @@ packages:
   '@sindresorhus/base62@1.0.0':
     resolution: {integrity: sha512-TeheYy0ILzBEI/CO55CP6zJCSdSWeRtGnHy8U8dWSUH4I68iqTsy7HkMktR4xakThc9jotkPQUXT4ITdbV7cHA==}
     engines: {node: '>=18'}
-
-  '@tsconfig/node-ts@23.6.4':
-    resolution: {integrity: sha512-37BMJvNQZ+vTgd1xG2TGBkJ6ENeT4eO4Wh2CHrnn0IwH7ybLFCzh4Uc//kc7UIvqiRac4uGdIc1meKOjMSlKzw==}
 
   '@tsconfig/node24@24.0.4':
     resolution: {integrity: sha512-2A933l5P5oCbv6qSxHs7ckKwobs8BDAe9SJ/Xr2Hy+nDlwmLE1GhFh/g/vXGRZWgxBg9nX/5piDtHR9Dkw/XuA==}
@@ -1725,8 +1719,6 @@ snapshots:
   '@rolldown/pluginutils@1.0.1': {}
 
   '@sindresorhus/base62@1.0.0': {}
-
-  '@tsconfig/node-ts@23.6.4': {}
 
   '@tsconfig/node24@24.0.4': {}
 
