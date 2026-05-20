@@ -1,2 +1,3 @@
 [tools]
+atlas = "1.2.0"
 node = "26"

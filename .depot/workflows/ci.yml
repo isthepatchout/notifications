@@ -71,7 +71,7 @@ jobs:
           - sequential:
             - uses: ariga/setup-atlas@4240bd74ba9f13319a21de2b6e497f2b6d184d76
               with:
-                version: v0.33.1
+                version: v1.2.0
             - run: atlas migrate apply --url $DATABASE_URL
             - name: run tests
               run: node --run test
