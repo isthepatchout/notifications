@@ -67,7 +67,7 @@ export const sendNotifications = async (
   })
 
   if (errors.length > 0) {
-    log.error({ message: "Failed to send some notifications", errors })
+    log.error({ message: "Failed to send some notifications", error: errors[0] })
   }
 
   const handledCounts = await Promise.all([
