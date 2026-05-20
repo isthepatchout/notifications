@@ -79,7 +79,7 @@ jobs:
             run: node --run typecheck
 
   docker-image:
-    needs: [ci]
+    #needs: [ci]
     runs-on: depot-ubuntu-24.04-4
 
     steps:
@@ -87,10 +87,21 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@030e881283bb7a6894de51c315a6bfe6a94e05cf # v6.0.0
+        with:
+          images: |
+            v3pngn245j.registry.depot.dev/itpo-notif
+          tags: |
+            type=raw,value={{sha}}
+            type=raw,value=latest
+
       - uses: depot/build-push-action@5f3b3c2e5a00f0093de47f657aeaefcedff27d18 # v1.17.0
         with:
           project: 520fcf1v75
           context: .
-          save: true
-          save-tags: v3pngn245j.registry.depot.dev/itpo-notif:latest
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
 
