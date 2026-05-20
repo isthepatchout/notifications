@@ -101,7 +101,7 @@ jobs:
         with:
           project: 520fcf1v75
           context: .
-          tags: ${{ steps.meta.outputs.tags }}
+          save-tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           save: true
 
