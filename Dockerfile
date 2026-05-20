@@ -10,13 +10,15 @@ ENV NODE_ENV=production
 ENV NODE_COMPILE_CACHE=/node-cc
 RUN mkdir -p $NODE_COMPILE_CACHE
 
-RUN npm i -g corepack
-
 FROM base AS build
 
 ENV CI=1
 
+RUN npm i -g corepack
+
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+
+RUN corepack prepare --activate
 
 # Install dependencies
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
