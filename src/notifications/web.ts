@@ -1,18 +1,19 @@
 import { log } from "evlog"
 import PQueue from "p-queue"
-import WebPush, { type WebPushError } from "web-push"
+import { deserializeVapidKeys, sendPushNotification } from "web-push-browser"
 
 import { queries } from "../db/db.ts"
 import type { Patch } from "../db/schema.ts"
 
-if (process.env.NODE_ENV !== "test") {
-  WebPush.setGCMAPIKey(process.env.GCM_API_KEY!)
-  WebPush.setVapidDetails(
-    "mailto:adam@haglund.dev",
-    process.env.VAPID_PUBLIC_KEY!,
-    process.env.VAPID_PRIVATE_KEY!,
-  )
-}
+export type WebPushResponse =
+  | { endpoint: string; response: Response; error: null }
+  | { endpoint: string; response: null; error: Error }
+
+const EMAIL = "mailto:adam+itpo@haglund.dev"
+const keyPair = await deserializeVapidKeys({
+  publicKey: process.env.VAPID_PUBLIC_KEY!,
+  privateKey: process.env.VAPID_PRIVATE_KEY!,
+})
 
 type PushEventPatch = Patch & { type: "patch" }
 
@@ -26,27 +27,27 @@ const sendNotification = async (
   auth: string,
   p256dh: string,
   patchData: PushEventPatch,
-) =>
+): Promise<WebPushResponse> =>
   webPushLimiter
     .add(async () =>
-      WebPush.sendNotification(
-        {
-          endpoint,
-          keys: { auth, p256dh },
-        },
+      sendPushNotification(
+        keyPair,
+        { endpoint, keys: { auth, p256dh } },
+        EMAIL,
         JSON.stringify(patchData),
+        { algorithm: "aes128gcm", urgency: "high" },
       ),
     )
-    .then(() => endpoint)
-    .catch((error) => error as WebPushError | Error)
+    .then((response) => ({ endpoint, response, error: null }))
+    .catch((error) => ({ endpoint, response: null, error: error as Error }))
 
-const handleExpired = async (errors: WebPushError[]): Promise<number> => {
-  if (errors.length === 0) return 0
+const handleExpired = async (responses: WebPushResponse[]): Promise<number> => {
+  if (responses.length === 0) return 0
 
-  log.debug({ errors })
+  log.debug({ errors: responses })
 
-  const expired = errors.filter((error) => error.statusCode === 410)
-  const rest = errors.filter((error) => error.statusCode !== 410)
+  const expired = responses.filter(({ response }) => response?.status === 410)
+  const rest = responses.filter(({ response }) => response?.status !== 410)
   log.info("web", `${expired.length} Web Push subscriptions have expired.`)
 
   if (rest.length > 0) {
@@ -56,7 +57,7 @@ const handleExpired = async (errors: WebPushError[]): Promise<number> => {
   if (expired.length === 0) return 0
 
   const deletedCount = await queries.deleteSubscriptions(
-    expired.map((error) => error.endpoint),
+    expired.map(({ endpoint }) => endpoint),
   )
 
   return deletedCount
