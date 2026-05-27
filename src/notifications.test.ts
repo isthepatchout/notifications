@@ -124,7 +124,7 @@ it("should remove expired discord webhooks", async () => {
   assert.equal(results[1]!.endpoint.at(-1), "1")
 })
 
-void it.skip("should remove expired push webhooks", async () => {
+it("should remove expired push webhooks", async () => {
   await generateSubs(2, "push")
   await generateSubs(2, "push", true)
 
