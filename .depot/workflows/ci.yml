@@ -69,18 +69,18 @@ jobs:
           - name: lint
             run: node --run lint
           - sequential:
-            - uses: ariga/setup-atlas@4240bd74ba9f13319a21de2b6e497f2b6d184d76
-              with:
-                version: v1.2.0
-            - run: atlas migrate apply --url $DATABASE_URL
-            - name: run tests
-              run: node --run test
+              - uses: ariga/setup-atlas@4240bd74ba9f13319a21de2b6e497f2b6d184d76
+                with:
+                  version: v1.2.0
+              - run: atlas migrate apply --url $DATABASE_URL
+              - name: run tests
+                run: node --run test
           - name: typecheck
             run: node --run typecheck
 
   docker-image:
     #needs: [ci]
-    runs-on: depot-ubuntu-24.04-4
+    runs-on: depot-ubuntu-24.04
 
     steps:
       - uses: depot/setup-action@15c09a5f77a0840ad4bce955686522a257853461 # v1.7.1
@@ -95,5 +95,5 @@ jobs:
           context: .
           save: true
           save-tags: |
-            v3pngn245j.registry.depot.dev/itpo-notif:latest
-            v3pngn245j.registry.depot.dev/itpo-notif:${{ github.sha }}
+            latest
+            ${{ github.sha }}
