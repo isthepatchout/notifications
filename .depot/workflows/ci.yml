@@ -95,5 +95,5 @@ jobs:
           context: .
           save: true
           save-tags: |
-            latest
-            ${{ github.sha }}
+            v3pngn245j.registry.depot.dev/itpo-notif:latest
+            v3pngn245j.registry.depot.dev/itpo-notif:${{ github.sha }}
