@@ -1,11 +1,12 @@
 import { log } from "evlog"
 import type { Insertable } from "kysely"
+import type { WebPushError } from "web-push"
 import type { XiorError } from "xior"
 
 import { queries } from "./db/db.ts"
 import type { Patch, PushSubscription } from "./db/schema.ts"
 import { Discord } from "./notifications/discord.ts"
-import { Web, type WebPushResponse } from "./notifications/web.ts"
+import { Web } from "./notifications/web.ts"
 
 type PushEventPatch = Patch & { type: "patch" }
 
@@ -24,7 +25,7 @@ export const sendNotifications = async (
   subscriptions: Insertable<PushSubscription>[],
   patch: Patch,
 ) => {
-  const promises: Array<Promise<string | WebPushResponse | XiorError | Error>> = []
+  const promises: Array<Promise<string | WebPushError | XiorError | Error>> = []
 
   for (const { type, endpoint, auth, extra } of subscriptions) {
     const patchData: PushEventPatch = {
@@ -43,7 +44,7 @@ export const sendNotifications = async (
 
   const errors = [] as Error[]
   const expiredDiscordWebhooks = [] as XiorError[]
-  const expiredWebPushes = [] as WebPushResponse[]
+  const expiredWebPushes = [] as WebPushError[]
   const successful = [] as string[]
 
   for (const result of results) {
