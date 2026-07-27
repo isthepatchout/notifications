@@ -26,7 +26,7 @@ const getUnnotifiedSubscriptions = db.prepare(`
   SELECT * FROM subscriptions
   WHERE environment = ? AND "lastNotified" < ?
   ORDER BY "createdAt"
-  LIMIT 1000
+  LIMIT 500
 `)
 const getUnnotifiedSubscriptionsCount = db.prepare(`
   SELECT COUNT(endpoint) AS count FROM subscriptions
