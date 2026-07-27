@@ -1,5 +1,4 @@
 import { log } from "evlog"
-import type { Insertable } from "kysely"
 import type { WebPushError } from "web-push"
 import type { XiorError } from "xior"
 
@@ -18,10 +17,7 @@ const handleSentNotifications = async (endpoints: string[], patch: Patch): Promi
   return result.length
 }
 
-export const sendNotifications = async (
-  subscriptions: Insertable<PushSubscription>[],
-  patch: Patch,
-) => {
+export const sendNotifications = async (subscriptions: PushSubscription[], patch: Patch) => {
   const promises: Array<Promise<string | WebPushError | XiorError | Error>> = []
 
   for (const { type, endpoint, auth, extra } of subscriptions) {

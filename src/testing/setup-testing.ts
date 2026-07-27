@@ -4,10 +4,6 @@ import { randomBytes } from "node:crypto"
 import { db } from "../db/db.ts"
 import type { PushSubscription } from "../db/schema.ts"
 
-if (!process.env.DATABASE_URL?.includes("localhost")) {
-  throw new Error("This script can only be run in a local environment")
-}
-
 const generateP256dh = async () => {
   const keyPair = await crypto.subtle.generateKey(
     { name: "ECDH", namedCurve: "P-256" },
@@ -48,7 +44,7 @@ const generateSubs = async (
   )
 }
 
-await Promise.all([db.deleteFrom("patches").execute(), db.deleteFrom("subscriptions").execute()])
+db.exec("DELETE FROM patches; DELETE FROM subscriptions;")
 
 const subs = [
   await generateSubs(100, "discord"),
@@ -57,14 +53,21 @@ const subs = [
   await generateSubs(100, "push", true),
 ].flat()
 
-await db.insertInto("subscriptions").values(subs).execute()
+const insertSubscription = db.prepare(`
+  INSERT INTO subscriptions (type, endpoint, auth, extra, environment, "lastNotified")
+  VALUES (?, ?, ?, ?, ?, ?)
+`)
+for (const subscription of subs) {
+  insertSubscription.run(
+    subscription.type,
+    subscription.endpoint,
+    subscription.auth,
+    subscription.extra,
+    subscription.environment,
+    subscription.lastNotified,
+  )
+}
 
-await db
-  .insertInto("patches")
-  .values({
-    id: "8.00",
-    number: 80000,
-    releasedAt: new Date(),
-    links: [],
-  })
-  .execute()
+db.prepare(`
+  INSERT INTO patches (id, number, "releasedAt", links) VALUES (?, ?, ?, ?)
+`).run("8.00", 80000, new Date().toISOString(), JSON.stringify([]))

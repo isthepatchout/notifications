@@ -150,12 +150,6 @@ importers:
       evlog:
         specifier: 2.22.3
         version: 2.22.3
-      kysely:
-        specifier: 0.29.4
-        version: 0.29.4
-      kysely-postgres-js:
-        specifier: 3.0.0
-        version: 3.0.0(kysely@0.29.4)(postgres@3.4.9)
       mentoss:
         specifier: 0.13.0
         version: 0.13.0
@@ -174,9 +168,6 @@ importers:
       p-queue:
         specifier: 9.3.3
         version: 9.3.3
-      postgres:
-        specifier: 3.4.9
-        version: 3.4.9
       simple-git-hooks:
         specifier: 2.13.1
         version: 2.13.1
@@ -892,20 +883,6 @@ packages:
   jws@4.0.1:
     resolution: {integrity: sha512-EKI/M/yqPncGUUh44xz0PxSidXFr/+r0pA70+gIYhjv+et7yxM+s29Y+VGDkovRofQem0fs7Uvf4+YmAdyRduA==}
 
-  kysely-postgres-js@3.0.0:
-    resolution: {integrity: sha512-o2t/xNSYJQDW6rVGGFPXKmZ0BEz2dGn66c2B+cO/k9ZNcU2qPWPycQPQ+B+P2MBXbKYq0xV9BZmFIvkUrmFWAQ==}
-    engines: {bun: '>=1.2', node: '>=20'}
-    peerDependencies:
-      kysely: '>= 0.24.0 < 1'
-      postgres: ^3.4.0
-    peerDependenciesMeta:
-      postgres:
-        optional: true
-
-  kysely@0.29.4:
-    resolution: {integrity: sha512-y5mVgQNkMbs1eK9Xyc0pmNdabN2wHhRYY/5r4W5HrUT1rYCEPeVNSj1RUJeSDKT3U0p+mXCvLgkrFuIafYI6BA==}
-    engines: {node: '>=22.0.0'}
-
   mentoss@0.13.0:
     resolution: {integrity: sha512-hWibd61D8WRnntW4eCdvPYCLeuoxbNSqbN0I8n0lpYe+7Slp8hSIq/1sNYuX0SvAzaXsuITV0dnGyO10kkwAQQ==}
     engines: {node: '>=18.18'}
@@ -971,10 +948,6 @@ packages:
 
   picomatch@4.0.5:
     resolution: {integrity: sha512-RvwwcruNjI1ncT5xRakeyS9Lf8lcItv34KD+aif+VH9kduAyfYBipGh12274xtenIPZ119/R9BdTBa8gAwSh0A==}
-    engines: {node: '>=12'}
-
-  postgres@3.4.9:
-    resolution: {integrity: sha512-GD3qdB0x1z9xgFI6cdRD6xu2Sp2WCOEoe3mtnyB5Ee0XrrL5Pe+e4CCnJrRMnL1zYtRDZmQQVbvOttLnKDLnaw==}
     engines: {node: '>=12'}
 
   quansync@1.0.0:
@@ -1492,14 +1465,6 @@ snapshots:
       jwa: 2.0.1
       safe-buffer: 5.2.1
 
-  kysely-postgres-js@3.0.0(kysely@0.29.4)(postgres@3.4.9):
-    dependencies:
-      kysely: 0.29.4
-    optionalDependencies:
-      postgres: 3.4.9
-
-  kysely@0.29.4: {}
-
   mentoss@0.13.0:
     dependencies:
       urlpattern-polyfill: 10.1.0
@@ -1580,8 +1545,6 @@ snapshots:
   p-timeout@7.0.1: {}
 
   picomatch@4.0.5: {}
-
-  postgres@3.4.9: {}
 
   quansync@1.0.0: {}
 

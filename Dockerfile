@@ -35,6 +35,7 @@ FROM base
 COPY package.json ./
 
 COPY --from=build /app/dist dist/
+COPY --from=build /app/src/db/migrations/ dist/migrations/
 
 # Run with...
 # Source maps enabled, since it does not affect performance from what I found

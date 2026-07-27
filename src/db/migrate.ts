@@ -1,32 +1,31 @@
-import { readdir, readFile } from "node:fs/promises"
-import { join } from "node:path"
+import { readdirSync, readFileSync } from "node:fs"
+import { dirname, join } from "node:path"
+import type { DatabaseSync } from "node:sqlite"
+import { fileURLToPath } from "node:url"
 
 import { log } from "evlog"
-import postgres, { type Sql } from "postgres"
 
-const migrationsDirectory = join(import.meta.dirname, "migrations")
+const migrationsDirectory = join(dirname(fileURLToPath(import.meta.url)), "migrations")
 
-export async function migrate(db: Sql) {
+export function migrate(db: DatabaseSync) {
   log.info("migrations", "Starting DB migrations...")
 
-  await db.unsafe(`
+  db.exec(`
+    PRAGMA journal_mode = WAL;
+    PRAGMA wal_autocheckpoint = 1000;
     CREATE TABLE IF NOT EXISTS migrations (
       name TEXT PRIMARY KEY,
-      applied_at TIMESTAMPTZ NOT NULL DEFAULT now()
-    )
+      applied_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
   `)
 
-  const files = (await readdir(migrationsDirectory))
+  const migrations = readdirSync(migrationsDirectory)
     .filter((file) => file.endsWith(".sql"))
     .toSorted()
-  const migrations = await Promise.all(
-    files.map(async (name) => ({
-      name,
-      sql: await readFile(join(migrationsDirectory, name), "utf8"),
-    })),
-  )
-  const rows = await db<{ name: string }[]>`SELECT name FROM migrations`
+    .map((name) => ({ name, sql: readFileSync(join(migrationsDirectory, name), "utf8") }))
+  const rows = db.prepare("SELECT name FROM migrations").all() as Array<{ name: string }>
   const applied = new Set(rows.map((row) => row.name))
+  const recordMigration = db.prepare("INSERT INTO migrations (name) VALUES (?)")
 
   for (const migration of migrations) {
     if (applied.has(migration.name)) continue
@@ -34,31 +33,19 @@ export async function migrate(db: Sql) {
     log.info("migrations", `Applying ${migration.name}...`)
 
     try {
-      // Migrations must be committed in filename order.
-      // oxlint-disable-next-line no-await-in-loop
-      await db.begin(async (transaction) => {
-        await transaction.unsafe(migration.sql)
-        await transaction`INSERT INTO migrations (name) VALUES (${migration.name})`
-      })
-
+      db.exec("BEGIN IMMEDIATE")
+      db.exec(migration.sql)
+      recordMigration.run(migration.name)
+      db.exec("COMMIT")
       log.info("migrations", `Applied ${migration.name}`)
     } catch (error) {
+      try {
+        db.exec("ROLLBACK")
+      } catch {}
       log.error("migrations", `Migration ${migration.name} failed: ${(error as Error).message}`)
       throw new Error(`Migration failed: ${migration.name}`, { cause: error })
     }
   }
 
   log.info("migrations", "Migrations are up to date.")
-}
-
-const databaseUrl = process.env.DATABASE_URL
-
-if (!databaseUrl) throw new Error("DATABASE_URL is required to run migrations")
-
-const db = postgres(databaseUrl, { max: 1 })
-
-try {
-  await migrate(db)
-} finally {
-  await db.end()
 }

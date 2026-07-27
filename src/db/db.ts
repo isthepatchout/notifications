@@ -1,75 +1,61 @@
-import { log } from "evlog"
-import { Kysely } from "kysely"
-import { PostgresJSDialect } from "kysely-postgres-js"
-import postgres from "postgres"
+import fs from "node:fs"
+import { DatabaseSync } from "node:sqlite"
 
+import { log } from "evlog"
+
+import { migrate } from "./migrate.ts"
 import type { Patch, PushSubscription } from "./schema.ts"
 
-type Database = {
-  patches: Patch
-  subscriptions: PushSubscription
-}
+fs.mkdirSync(".data", { recursive: true })
+export const db = new DatabaseSync(".data/db.sqlite")
 
-export const pg = postgres(process.env.DATABASE_URL!)
-export const db = new Kysely<Database>({
-  dialect: new PostgresJSDialect({
-    postgres: pg,
-  }),
+migrate(db)
+log.info("db", "Connected to .data/db.sqlite")
+
+type PatchRow = Omit<Patch, "links"> & { links: Buffer | string | null }
+
+const toPatch = (row: PatchRow): Patch => ({
+  ...row,
+  links: JSON.parse(row.links?.toString() ?? "[]") as string[],
 })
 
-// Perform connection check
-const checkConnection = async () => {
-  await db.selectFrom("patches").limit(1).execute()
+const getLatestPatch = db.prepare(`
+  SELECT * FROM patches ORDER BY number DESC LIMIT 1
+`)
+const getUnnotifiedSubscriptions = db.prepare(`
+  SELECT * FROM subscriptions
+  WHERE environment = ? AND "lastNotified" < ?
+  ORDER BY "createdAt"
+  LIMIT 1000
+`)
+const getUnnotifiedSubscriptionsCount = db.prepare(`
+  SELECT COUNT(endpoint) AS count FROM subscriptions
+  WHERE environment = ? AND "lastNotified" < ?
+`)
 
-  log.info("db", `Connected to db @ ${new URL(process.env.DATABASE_URL!).host}`)
-}
-
-await checkConnection()
-
-export const getLatestPatchQuery = db
-  .selectFrom("patches")
-  .selectAll()
-  .orderBy("number", "desc")
-  .limit(1)
-
-const getUnnotifiedSubscriptions = async (patchNumber: number) =>
-  db
-    .selectFrom("subscriptions")
-    .selectAll()
-    .where("environment", "=", process.env.NODE_ENV)
-    .where("lastNotified", "<", patchNumber)
-    .orderBy("createdAt")
-    .limit(1000)
-    .execute()
-
-const getUnnotifiedSubscriptionsCount = async (patchNumber: number) =>
-  db
-    .selectFrom("subscriptions")
-    .select(({ fn }) => [fn.count<number>("endpoint").as("cnt")])
-    .where("environment", "=", process.env.NODE_ENV)
-    .where("lastNotified", "<", patchNumber)
-    .execute()
+const endpointsPlaceholders = (endpoints: string[]) => endpoints.map(() => "?").join(", ")
 
 export const queries = {
-  getLatestPatch: async () => {
+  getLatestPatch: async (): Promise<Patch> => {
     log.debug("db", "Getting latest patch...")
 
-    const rows = await getLatestPatchQuery.execute().catch((error) => error as Error)
+    try {
+      const row = getLatestPatch.get() as PatchRow | undefined
+      if (row == null) throw new Error("No patches found.")
 
-    if (rows instanceof Error) {
-      throw new TypeError("Failed to get latest patch.", { cause: rows })
+      const patch = toPatch(row)
+      log.debug({ tag: "db", message: "Got latest patch.", patch: patch.id })
+      return patch
+    } catch (error) {
+      if (error instanceof Error && error.message === "No patches found.") throw error
+      throw new TypeError("Failed to get latest patch.", { cause: error })
     }
-
-    if (rows.length === 0) {
-      throw new Error("No patches found.")
-    }
-
-    const patch = rows[0]!
-    log.debug({ tag: "db", message: "Got latest patch.", patch: patch.id })
-    return patch
   },
 
   updateNotifiedSubscriptions: async (endpoints: string[], patch: Patch) => {
+    if (endpoints.length === 0)
+      return [] as Array<Pick<PushSubscription, "endpoint" | "lastNotified">>
+
     log.debug({
       tag: "db",
       message: "Updating notified subscriptions...",
@@ -77,68 +63,57 @@ export const queries = {
       endpoints: endpoints.length,
     })
 
-    const result = await db
-      .updateTable("subscriptions")
-      .set("lastNotified", patch.number)
-      .where("endpoint", "in", endpoints)
-      .returning(["endpoint", "lastNotified"])
-      .execute()
+    const result = db
+      .prepare(`
+        UPDATE subscriptions SET "lastNotified" = ?
+        WHERE endpoint IN (${endpointsPlaceholders(endpoints)})
+        RETURNING endpoint, "lastNotified"
+      `)
+      .all(patch.number, ...endpoints) as Array<Pick<PushSubscription, "endpoint" | "lastNotified">>
 
-    log.debug({
-      tag: "db",
-      message: "Updated notified subscriptions...",
-      count: result.length,
-    })
-
+    log.debug({ tag: "db", message: "Updated notified subscriptions...", count: result.length })
     return result
   },
 
   deleteSubscriptions: async (endpoints: string[]) => {
+    if (endpoints.length === 0) return 0
+
     log.debug({ tag: "db", message: "Deleting subscriptions...", endpoints })
 
-    const result = await db
-      .deleteFrom("subscriptions")
-      .where("endpoint", "in", endpoints)
-      .returning(["lastNotified"])
-      .execute()
+    const result = db
+      .prepare(`
+        DELETE FROM subscriptions WHERE endpoint IN (${endpointsPlaceholders(endpoints)})
+        RETURNING "lastNotified"
+      `)
+      .all(...endpoints)
 
     return result.length
   },
 
   getUnnotifiedSubscriptions: async (patch: Patch) => {
-    log.debug({
-      tag: "db",
-      message: "Getting unnotified subscriptions...",
-      patch: patch.id,
-    })
+    log.debug({ tag: "db", message: "Getting unnotified subscriptions...", patch: patch.id })
 
-    const rows = await getUnnotifiedSubscriptions(patch.number).catch((error) => error as Error)
+    try {
+      const data = getUnnotifiedSubscriptions.all(
+        process.env.NODE_ENV,
+        patch.number,
+      ) as PushSubscription[]
+      const count = (
+        getUnnotifiedSubscriptionsCount.get(process.env.NODE_ENV, patch.number) as {
+          count: number
+        }
+      ).count
 
-    const countResults = await getUnnotifiedSubscriptionsCount(patch.number).catch(
-      (error) => error as Error,
-    )
-
-    if (rows instanceof Error || countResults instanceof Error) {
-      const error = (rows instanceof Error ? rows : countResults) as Error
-      log.error({ tag: "db", message: "Failed to get unnotified subscriptions.", error })
-
-      return {
-        data: null,
-        count: null,
-        error,
-      }
-    }
-
-    log.debug({
-      tag: "db",
-      message: "Got unnotified subscriptions.",
-      count: countResults[0]!.cnt,
-    })
-    return {
-      data: rows,
-      // oxlint-disable-next-line typescript/no-unnecessary-type-conversion
-      count: Number(countResults[0]!.cnt),
-      error: null,
+      log.debug({ tag: "db", message: "Got unnotified subscriptions.", count })
+      return { data, count, error: null }
+    } catch (error) {
+      const typedError = error as Error
+      log.error({
+        tag: "db",
+        message: "Failed to get unnotified subscriptions.",
+        error: typedError,
+      })
+      return { data: null, count: null, error: typedError }
     }
   },
 }

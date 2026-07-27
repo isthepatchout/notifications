@@ -7,7 +7,7 @@ import { after, afterEach, before, beforeEach, it } from "node:test"
 import { DotaVersion } from "dotaver"
 import { FetchMocker, MockServer } from "mentoss"
 
-import { db, pg } from "./db/db.ts"
+import { db } from "./db/db.ts"
 import type { Patch, PushSubscription } from "./db/schema.ts"
 import { sendNotifications } from "./notifications.ts"
 
@@ -50,27 +50,28 @@ const mockErrorRequest = (type: PushSubscription["type"], id: number) => {
 
 before(() => fetchMocker.mockGlobal())
 beforeEach(async () => {
-  await db.deleteFrom("subscriptions").execute()
+  db.exec("DELETE FROM subscriptions")
   index = 0
 })
 afterEach(async () => {
   fetchMocker.clearAll()
 })
 after(async () => {
-  await db.deleteFrom("subscriptions").execute()
+  db.exec("DELETE FROM subscriptions")
   fetchMocker.unmockGlobal()
-  await pg.end()
+  db.close()
 })
 
 const p256dh = await generateP256dh()
 const patch = {
   id: "8.00",
   number: DotaVersion.parse("8.00").toNumber(),
-  releasedAt: new Date(),
+  releasedAt: new Date().toISOString(),
   links: [],
 } satisfies Patch
 
-const getSubs = async () => db.selectFrom("subscriptions").selectAll().execute()
+const getSubs = () =>
+  db.prepare("SELECT * FROM subscriptions ORDER BY endpoint").all() as PushSubscription[]
 
 let index = 0
 const generateSubs = async (
@@ -91,17 +92,30 @@ const generateSubs = async (
       }) satisfies Omit<PushSubscription, "createdAt">,
   )
 
-  await db.insertInto("subscriptions").values(subscriptions).execute()
+  const insert = db.prepare(`
+    INSERT INTO subscriptions (type, endpoint, auth, extra, environment, "lastNotified")
+    VALUES (?, ?, ?, ?, ?, ?)
+  `)
+  for (const subscription of subscriptions) {
+    insert.run(
+      subscription.type,
+      subscription.endpoint,
+      subscription.auth,
+      subscription.extra,
+      subscription.environment,
+      subscription.lastNotified,
+    )
+  }
 }
 
 it("should send notifications", async () => {
   await generateSubs(5)
-  const subs = await getSubs()
+  const subs = getSubs()
   subs.forEach((sub, index) => mockSuccessRequest(sub.type, index))
 
   await sendNotifications(subs, patch)
 
-  const results = await getSubs()
+  const results = getSubs()
   assert.deepEqual(
     results.map((sub) => sub.lastNotified),
     [patch.number, patch.number, patch.number, patch.number, patch.number],
@@ -117,9 +131,9 @@ it("should remove expired discord webhooks", async () => {
   mockErrorRequest("discord", 2)
   mockErrorRequest("discord", 3)
 
-  await sendNotifications(await getSubs(), patch)
+  await sendNotifications(getSubs(), patch)
 
-  const results = await getSubs()
+  const results = getSubs()
   assert.equal(results.length, 2)
   assert.equal(results[0]!.endpoint.at(-1), "0")
   assert.equal(results[1]!.endpoint.at(-1), "1")
@@ -134,9 +148,9 @@ it("should remove expired push webhooks", async () => {
   mockErrorRequest("push", 2)
   mockErrorRequest("push", 3)
 
-  await sendNotifications(await getSubs(), patch)
+  await sendNotifications(getSubs(), patch)
 
-  const results = await getSubs()
+  const results = getSubs()
   assert.equal(results.length, 2)
   assert.equal(results[0]!.endpoint.at(-1), "0")
   assert.equal(results[1]!.endpoint.at(-1), "1")

@@ -1,10 +1,8 @@
-import type { Generated } from "kysely"
-
 export type Patch = {
   id: string
   number: number
   links: string[]
-  releasedAt: Date | null
+  releasedAt: string | null
 }
 
 export type PushSubscription = {
@@ -14,5 +12,5 @@ export type PushSubscription = {
   extra: string | null
   environment: string
   lastNotified: number
-  createdAt: Generated<Date>
+  createdAt: string
 }
