@@ -1,6 +1,6 @@
 import { log } from "evlog"
 import PQueue from "p-queue"
-import WebPush, { type WebPushError } from "web-push"
+import WebPush, { WebPushError } from "web-push"
 
 import { queries } from "../db/db.ts"
 import type { Patch } from "../db/schema.ts"
@@ -28,15 +28,28 @@ const sendNotification = async (
   patchData: PushEventPatch,
 ) =>
   webPushLimiter
-    .add(async () =>
-      WebPush.sendNotification(
-        {
-          endpoint,
-          keys: { auth, p256dh },
-        },
+    .add(async () => {
+      const details = WebPush.generateRequestDetails(
+        { endpoint, keys: { auth, p256dh } },
         JSON.stringify(patchData),
-      ),
-    )
+      )
+
+      const response = await fetch(details.endpoint, {
+        method: "POST",
+        headers: details.headers as Record<string, string>,
+        body: details.body ?? null,
+      })
+
+      if (!response.ok) {
+        throw new WebPushError(
+          `Request failed with status code ${response.status}`,
+          response.status,
+          Object.fromEntries(response.headers.entries()),
+          await response.text(),
+          endpoint,
+        )
+      }
+    })
     .then(() => endpoint)
     .catch((error) => error as WebPushError | Error)
 
