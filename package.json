@@ -13,35 +13,36 @@
     "pre-commit": "node_modules/.bin/nano-staged"
   },
   "nano-staged": {
-    "*.{js,ts,vue,html,json}": [
-      "prettier --write"
+    "*.{js,jsx,mjs,cjs,ts,tsx,mts,cts,json,json5,yaml,yml,css,scss,md}": [
+      "oxfmt --write --no-error-on-unmatched-pattern"
     ]
   },
   "scripts": {
     "build": "tsdown",
     "dev": "node --env-file=.env --watch src/index.ts",
-    "lint": "eslint --flag unstable_native_nodejs_ts_config",
+    "lint": "oxlint",
     "prepare": "simple-git-hooks",
     "start": "node dist/index.mjs",
     "test": "NODE_ENV=test node --test --env-file=.env.test src/**/*.test.ts",
     "typecheck": "tsc --noEmit --project tsconfig.json"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "9.0.0",
+    "@e18e/eslint-plugin": "0.6.0",
     "@tsconfig/node24": "24.0.4",
     "@tsconfig/strictest": "2.0.8",
     "@types/node": "25.9.2",
     "@types/web-push": "3.6.4",
     "dotaver": "2.0.1",
-    "eslint": "10.4.1",
     "evlog": "2.18.1",
     "kysely": "0.29.2",
     "kysely-postgres-js": "3.0.0",
     "mentoss": "0.13.0",
     "nano-staged": "1.0.2",
+    "oxfmt": "0.60.0",
+    "oxlint": "1.75.0",
+    "oxlint-tsgolint": "7.0.2001",
     "p-queue": "9.3.0",
     "postgres": "3.4.9",
-    "prettier": "3.8.3",
     "simple-git-hooks": "2.13.1",
     "srvx": "0.11.16",
     "tsdown": "0.22.2",

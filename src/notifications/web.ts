@@ -55,9 +55,7 @@ const handleExpired = async (errors: WebPushError[]): Promise<number> => {
 
   if (expired.length === 0) return 0
 
-  const deletedCount = await queries.deleteSubscriptions(
-    expired.map((error) => error.endpoint),
-  )
+  const deletedCount = await queries.deleteSubscriptions(expired.map((error) => error.endpoint))
 
   return deletedCount
 }

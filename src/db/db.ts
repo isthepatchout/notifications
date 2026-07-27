@@ -112,9 +112,7 @@ export const queries = {
       patch: patch.id,
     })
 
-    const rows = await getUnnotifiedSubscriptions(patch.number).catch(
-      (error) => error as Error,
-    )
+    const rows = await getUnnotifiedSubscriptions(patch.number).catch((error) => error as Error)
 
     const countResults = await getUnnotifiedSubscriptionsCount(patch.number).catch(
       (error) => error as Error,
@@ -138,6 +136,7 @@ export const queries = {
     })
     return {
       data: rows,
+      // oxlint-disable-next-line typescript/no-unnecessary-type-conversion
       count: Number(countResults[0]!.cnt),
       error: null,
     }

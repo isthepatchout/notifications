@@ -10,10 +10,7 @@ import { Web } from "./notifications/web.ts"
 
 type PushEventPatch = Patch & { type: "patch" }
 
-const handleSentNotifications = async (
-  endpoints: string[],
-  patch: Patch,
-): Promise<number> => {
+const handleSentNotifications = async (endpoints: string[], patch: Patch): Promise<number> => {
   if (endpoints.length === 0) return 0
 
   const result = await queries.updateNotifiedSubscriptions(endpoints, patch)

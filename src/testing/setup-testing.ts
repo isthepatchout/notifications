@@ -48,10 +48,7 @@ const generateSubs = async (
   )
 }
 
-await Promise.all([
-  db.deleteFrom("patches").execute(),
-  db.deleteFrom("subscriptions").execute(),
-])
+await Promise.all([db.deleteFrom("patches").execute(), db.deleteFrom("subscriptions").execute()])
 
 const subs = [
   await generateSubs(100, "discord"),

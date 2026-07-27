@@ -1,3 +1,4 @@
+// oxlint-disable typescript/no-floating-promises
 import assert from "node:assert/strict"
 import { Buffer } from "node:buffer"
 import { randomBytes } from "node:crypto"

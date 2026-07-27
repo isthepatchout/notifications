@@ -10,11 +10,7 @@ const log = createLogger()
 const watcher = async () => {
   try {
     const latestPatch = await queries.getLatestPatch()
-    const {
-      error,
-      data: subs,
-      count,
-    } = await queries.getUnnotifiedSubscriptions(latestPatch)
+    const { error, data: subs, count } = await queries.getUnnotifiedSubscriptions(latestPatch)
     if (error != null) throw error
 
     if (count === 0) {
@@ -34,6 +30,7 @@ const watcher = async () => {
 
 export const initWatcher = async () => {
   while (true) {
+    // oxlint-disable-next-line no-await-in-loop
     await watcher()
   }
 }
