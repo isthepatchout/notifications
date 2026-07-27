@@ -144,6 +144,9 @@ importers:
       '@types/web-push':
         specifier: 3.6.4
         version: 3.6.4
+      alleviate:
+        specifier: 0.2.3
+        version: 0.2.3
       dotaver:
         specifier: 2.0.1
         version: 2.0.1
@@ -165,9 +168,6 @@ importers:
       oxlint-tsgolint:
         specifier: 7.0.2001
         version: 7.0.2001
-      p-queue:
-        specifier: 9.3.3
-        version: 9.3.3
       simple-git-hooks:
         specifier: 2.13.1
         version: 2.13.1
@@ -734,6 +734,10 @@ packages:
     resolution: {integrity: sha512-MnA+YT8fwfJPgBx3m60MNqakm30XOkyIoH1y6huTQvC0PwZG7ki8NacLBcrPbNoo8vEZy7Jpuk7+jMO+CUovTQ==}
     engines: {node: '>= 14'}
 
+  alleviate@0.2.3:
+    resolution: {integrity: sha512-wxE7NooBoTS6kNnBiUA+VAHCUe4h4dthpG3F5FUGET/vf1AidlX6pq7Pj9V+oTLpObE3S8w6icSmshb7kpPD+w==}
+    engines: {node: ^22.11 || ^24 || ^26 || ^27}
+
   ansis@4.3.1:
     resolution: {integrity: sha512-BJ8/l4R5LRE7hW9WdSuGYrLSHi2ynxeFpDFbH0K/CgNeY/tyhk+vO6TYxXC5r5CpUhNVX310xzPsN/H9lCdfOA==}
     engines: {node: '>=14'}
@@ -782,9 +786,6 @@ packages:
   empathic@2.0.1:
     resolution: {integrity: sha512-YGRs8knHhKHVShLkFET/rWAU8kmHbOV5LwN938RHI0pljAJ1Gf6SzXsSmRaEzcXTtOOmVqJ5+WtQPL5uigY50Q==}
     engines: {node: '>=14'}
-
-  eventemitter3@5.0.4:
-    resolution: {integrity: sha512-mlsTRyGaPBjPedk6Bvw+aqbsXDtoAyAzm5MO7JgU+yVRyMQ5O8bD4Kcci7BS85f93veegeCPkL8R4GLClnjLFw==}
 
   evlog@2.22.3:
     resolution: {integrity: sha512-xybbUKtV26ezgyagT0aZ6tigIjwQuc4mI0Fm52goospAdGAA4ApC+keC36Bsxt1Gm7vT8W429T3WIsqMc8nwMQ==}
@@ -937,14 +938,6 @@ packages:
         optional: true
       vite-plus:
         optional: true
-
-  p-queue@9.3.3:
-    resolution: {integrity: sha512-NXAOdnEe5FsZJfT4oK84lE1Y5cFFdWlRuOo5tww8DyNMxyRXwn39fIkUtNLKppcPC+UYU/bXujNCUGDv01y7CA==}
-    engines: {node: '>=20'}
-
-  p-timeout@7.0.1:
-    resolution: {integrity: sha512-AxTM2wDGORHGEkPCt8yqxOTMgpfbEHqF51f/5fJCmwFC3C/zNcGT63SymH2ttOAaiIws2zVg4+izQCjrakcwHg==}
-    engines: {node: '>=20'}
 
   picomatch@4.0.5:
     resolution: {integrity: sha512-RvwwcruNjI1ncT5xRakeyS9Lf8lcItv34KD+aif+VH9kduAyfYBipGh12274xtenIPZ119/R9BdTBa8gAwSh0A==}
@@ -1396,6 +1389,8 @@ snapshots:
 
   agent-base@7.1.4: {}
 
+  alleviate@0.2.3: {}
+
   ansis@4.3.1: {}
 
   asn1.js@5.4.1:
@@ -1426,8 +1421,6 @@ snapshots:
       safe-buffer: 5.2.1
 
   empathic@2.0.1: {}
-
-  eventemitter3@5.0.4: {}
 
   evlog@2.22.3: {}
 
@@ -1536,13 +1529,6 @@ snapshots:
       '@oxlint/binding-win32-ia32-msvc': 1.75.0
       '@oxlint/binding-win32-x64-msvc': 1.75.0
       oxlint-tsgolint: 7.0.2001
-
-  p-queue@9.3.3:
-    dependencies:
-      eventemitter3: 5.0.4
-      p-timeout: 7.0.1
-
-  p-timeout@7.0.1: {}
 
   picomatch@4.0.5: {}
 

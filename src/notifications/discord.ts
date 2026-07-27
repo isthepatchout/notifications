@@ -1,5 +1,5 @@
+import { createLimiter } from "alleviate"
 import { log } from "evlog"
-import PQueue from "p-queue"
 import xior, { type XiorError } from "xior"
 
 import { queries } from "../db/db.ts"
@@ -7,11 +7,11 @@ import type { Patch } from "../db/schema.ts"
 
 type PushEventPatch = Patch & { type: "patch" }
 
-const discordLimiter = new PQueue({
-  timeout: 10_000,
+const discordLimiter = createLimiter({
   concurrency: 50,
-  interval: 1000,
-  intervalCap: 49,
+  refill: 24,
+  refillInterval: 500,
+  timeout: 10_000,
 })
 
 const sendNotification = async (endpoint: string, patch: PushEventPatch) => {
@@ -25,7 +25,7 @@ const sendNotification = async (endpoint: string, patch: PushEventPatch) => {
   }))
 
   return discordLimiter
-    .add(async () =>
+    .run(async () =>
       xior.post(
         endpoint,
         {

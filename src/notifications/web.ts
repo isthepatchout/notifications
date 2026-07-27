@@ -1,5 +1,5 @@
+import { createLimiter } from "alleviate"
 import { log } from "evlog"
-import PQueue from "p-queue"
 import WebPush, { WebPushError } from "web-push"
 
 import { queries } from "../db/db.ts"
@@ -16,9 +16,11 @@ if (process.env.NODE_ENV !== "test") {
 
 type PushEventPatch = Patch & { type: "patch" }
 
-const webPushLimiter = new PQueue({
-  timeout: 10_000,
+const webPushLimiter = createLimiter({
   concurrency: 100,
+  refill: 50,
+  refillInterval: 500,
+  timeout: 10_000,
 })
 
 const sendNotification = async (
@@ -28,7 +30,7 @@ const sendNotification = async (
   patchData: PushEventPatch,
 ) =>
   webPushLimiter
-    .add(async () => {
+    .run(async () => {
       const details = WebPush.generateRequestDetails(
         { endpoint, keys: { auth, p256dh } },
         JSON.stringify(patchData),
@@ -37,6 +39,7 @@ const sendNotification = async (
       const response = await fetch(details.endpoint, {
         method: "POST",
         headers: details.headers as Record<string, string>,
+        // oxlint-disable-next-line typescript/no-unnecessary-condition
         body: details.body ?? null,
       })
 
