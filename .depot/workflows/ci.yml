@@ -16,28 +16,6 @@ jobs:
   ci:
     runs-on: depot-ubuntu-24.04-4
 
-    env:
-      NODE_ENV: test
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres?sslmode=disable
-
-    services:
-      # Label used to access the service container
-      postgres:
-        # Docker Hub image
-        image: orioledb/orioledb:latest-pg17
-        # Provide the password for postgres
-        env:
-          POSTGRES_PASSWORD: postgres
-        # Set health checks to wait until postgres has started
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          # Maps tcp port 5432 on service container to the host
-          - 5432:5432
-
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -70,7 +48,11 @@ jobs:
             run: node --run lint
   #          - sequential:
   #              - run: node --run migrate
+  #                env:
+  #                  NODE_ENV: test
   #              - name: run tests
+  #                env:
+  #                  NODE_ENV: test
   #                run: node --run test
 
   docker-image:
