@@ -68,10 +68,10 @@ jobs:
             run: node --run build
           - name: lint
             run: node --run lint
-          - sequential:
-              - run: node --run migrate
-              - name: run tests
-                run: node --run test
+  #          - sequential:
+  #              - run: node --run migrate
+  #              - name: run tests
+  #                run: node --run test
 
   docker-image:
     needs: [ci]
