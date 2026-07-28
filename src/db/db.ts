@@ -9,7 +9,10 @@ import type { Patch, PushSubscription } from "./schema.ts"
 fs.mkdirSync(".data", { recursive: true })
 export const db = new DatabaseSync(".data/db.sqlite")
 
-migrate(db)
+if (process.env.NODE_ENV === "test" || process.env.NODE_ENV === "development") {
+  migrate(db)
+}
+
 log.info("db", "Connected to .data/db.sqlite")
 
 type PatchRow = Omit<Patch, "links"> & { links: Buffer | string | null }
