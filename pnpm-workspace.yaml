@@ -2,6 +2,8 @@ allowBuilds:
   simple-git-hooks: false
 
 minimumReleaseAge: 4320
+minimumReleaseAgeExclude:
+  - alleviate@0.2.3
 
 dedupePeers: true
 dedupePeerDependents: true
