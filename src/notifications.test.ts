@@ -93,8 +93,9 @@ const generateSubs = async (
   )
 
   const insert = db.prepare(`
-    INSERT INTO subscriptions (type, endpoint, auth, extra, environment, "lastNotified")
-    VALUES (?, ?, ?, ?, ?, ?)
+    INSERT INTO subscriptions
+      (type, endpoint, auth, extra, environment, "lastNotified", "createdAt")
+    VALUES (?, ?, ?, ?, ?, ?, ?)
   `)
   for (const subscription of subscriptions) {
     insert.run(
@@ -104,6 +105,7 @@ const generateSubs = async (
       subscription.extra,
       subscription.environment,
       subscription.lastNotified,
+      Temporal.Now.instant().toString(),
     )
   }
 }

@@ -1,5 +1,5 @@
 {
-  "extends": ["@tsconfig/node24/tsconfig.json", "@tsconfig/strictest/tsconfig.json"],
+  "extends": ["@tsconfig/node26/tsconfig.json", "@tsconfig/strictest/tsconfig.json"],
   "compilerOptions": {
     // Output
     "noEmit": true,
@@ -18,6 +18,5 @@
     // Extra types
     "types": ["node"]
   },
-  "include": ["./"],
-  "exclude": ["node_modules", "dist", "copy.ts"]
+  "include": ["./"]
 }
