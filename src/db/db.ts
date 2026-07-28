@@ -56,8 +56,9 @@ export const queries = {
   },
 
   updateNotifiedSubscriptions: async (endpoints: string[], patch: Patch) => {
-    if (endpoints.length === 0)
+    if (endpoints.length === 0) {
       return [] as Array<Pick<PushSubscription, "endpoint" | "lastNotified">>
+    }
 
     log.debug({
       tag: "db",
@@ -110,13 +111,12 @@ export const queries = {
       log.debug({ tag: "db", message: "Got unnotified subscriptions.", count })
       return { data, count, error: null }
     } catch (error) {
-      const typedError = error as Error
       log.error({
         tag: "db",
         message: "Failed to get unnotified subscriptions.",
-        error: typedError,
+        error,
       })
-      return { data: null, count: null, error: typedError }
+      return { data: null, count: null, error: error as Error }
     }
   },
 }
