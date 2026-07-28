@@ -7,7 +7,7 @@ import type { Patch, PushSubscription } from "./db/schema.ts"
 import { Discord } from "./notifications/discord.ts"
 import { Web } from "./notifications/web.ts"
 
-// type PushEventPatch = Patch & { type: "patch" }
+type PushEventPatch = Patch & { type: "patch" }
 
 const handleSentNotifications = async (endpoints: string[], patch: Patch): Promise<number> => {
   if (endpoints.length === 0) return 0
@@ -20,18 +20,17 @@ const handleSentNotifications = async (endpoints: string[], patch: Patch): Promi
 export const sendNotifications = async (subscriptions: PushSubscription[], patch: Patch) => {
   const promises: Array<Promise<string | WebPushError | XiorError | Error>> = []
 
-  for (const { type /*endpoint, auth, extra*/ } of subscriptions) {
-    // const patchData: PushEventPatch = {
-    //   type: "patch",
-    //   ...patch,
-    // }
+  for (const { type, endpoint, auth, extra } of subscriptions) {
+    const patchData: PushEventPatch = {
+      type: "patch",
+      ...patch,
+    }
 
-    log.info({ type, msg: "would send notification here" })
-    // promises.push(
-    //   type === "push"
-    //     ? Web.sendNotification(endpoint, auth, extra!, patchData)
-    //     : Discord.sendNotification(endpoint, patchData),
-    // )
+    promises.push(
+      type === "push"
+        ? Web.sendNotification(endpoint, auth, extra!, patchData)
+        : Discord.sendNotification(endpoint, patchData),
+    )
   }
 
   const results = await Promise.all(promises)
