@@ -1,8 +1,8 @@
-FROM node:26-alpine AS base
+FROM platformatic/node-caged:26-alpine AS base
 
 WORKDIR /app
 
-ENV PNPM_HOME=/pnpm
+ENV UPM_STORE=/upm
 # Use production in case any dependencies use it in any way
 ENV NODE_ENV=production
 
@@ -15,15 +15,13 @@ FROM base AS build
 
 ENV CI=1
 
-RUN npm i -g corepack
+RUN npm i -g upm@1.4.0
 
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-
-RUN corepack prepare --activate
+COPY package.json upm.lock ./
 
 # Install dependencies
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
-    pnpm install --frozen-lockfile --ignore-scripts
+RUN --mount=type=cache,id=upm,target=/upm \
+    upm install --frozen-lockfile --ignore-scripts
 
 COPY tsconfig.json tsdown.config.ts ./
 COPY src/ src/
@@ -40,7 +38,5 @@ COPY --from=build /app/src/db/migrations/ dist/migrations/
 # Run with...
 # Source maps enabled, since it does not affect performance from what I found
 ENV NODE_OPTIONS="--enable-source-maps"
-# Warnings disabled, we know what we're doing and they're annoying
-ENV NODE_NO_WARNINGS=1
 
 CMD ["node", "--run", "start"]
