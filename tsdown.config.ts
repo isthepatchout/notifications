@@ -3,7 +3,29 @@ import { defineConfig } from "tsdown"
 export default defineConfig({
   entry: "src/index.ts",
   outDir: "dist",
-  deps: { onlyBundle: false },
+  deps: {
+    onlyBundle: [
+      "agent-base",
+      "alleviate",
+      "asn1.js",
+      "bn.js",
+      "buffer-equal-constant-time",
+      "debug",
+      "ecdsa-sig-formatter",
+      "evlog",
+      "http_ece",
+      "https-proxy-agent",
+      "inherits",
+      "jwa",
+      "jws",
+      "minimalistic-assert",
+      "ms",
+      "safe-buffer",
+      "safer-buffer",
+      "web-push",
+      "xior",
+    ],
+  },
 
   env: {
     NODE_ENV: process.env.NODE_ENV || "production",
