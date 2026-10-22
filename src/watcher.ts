@@ -1,11 +1,9 @@
 import { setTimeout } from "node:timers/promises"
 
-import { createLogger } from "evlog"
+import { log } from "evlog"
 
 import { queries } from "./db/db.ts"
 import { sendNotifications } from "./notifications.ts"
-
-const log = createLogger()
 
 const watcher = async () => {
   try {

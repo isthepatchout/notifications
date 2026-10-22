@@ -30,7 +30,7 @@ const sendNotification = async (
   patchData: PushEventPatch,
 ) =>
   webPushLimiter
-    .run(async () => {
+    .run(async (signal) => {
       const details = WebPush.generateRequestDetails(
         { endpoint, keys: { auth, p256dh } },
         JSON.stringify(patchData),
@@ -41,6 +41,7 @@ const sendNotification = async (
         headers: details.headers as Record<string, string>,
         // oxlint-disable-next-line typescript/no-unnecessary-condition
         body: details.body ?? null,
+        signal,
       })
 
       if (!response.ok) {
@@ -52,6 +53,8 @@ const sendNotification = async (
           endpoint,
         )
       }
+
+      await response.body?.cancel()
     })
     .then(() => endpoint)
     .catch((error) => error as WebPushError | Error)

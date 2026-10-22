@@ -25,7 +25,7 @@ const sendNotification = async (endpoint: string, patch: PushEventPatch) => {
   }))
 
   return discordLimiter
-    .run(async () =>
+    .run(async (signal) =>
       xior.post(
         endpoint,
         {
@@ -37,7 +37,7 @@ const sendNotification = async (endpoint: string, patch: PushEventPatch) => {
             },
           ],
         },
-        { responseType: "json" },
+        { signal, responseType: "json" },
       ),
     )
     .then(() => endpoint)
